@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Android Jetpack Compose View Lib</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_cancel">Cancel</string>
+</resources>
