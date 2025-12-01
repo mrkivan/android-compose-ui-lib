@@ -3,15 +3,16 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    // Hilt Plugin
+    alias(libs.plugins.hilt.android)
+
     id("maven-publish")
 }
 
 @Suppress("UnstableApiUsage")
 android {
     namespace = "com.tnm.android.core.ui"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -23,16 +24,22 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlin {
         jvmToolchain(17)
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -42,11 +49,18 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
-    packaging {
-        resources {
-            excludes += setOf("/META-INF/AL2.0", "/META-INF/LGPL2.1")
-        }
+
+    hilt {
+        enableAggregatingTask = false
     }
+
+    packaging {
+        resources.excludes += setOf(
+            "/META-INF/AL2.0",
+            "/META-INF/LGPL2.1"
+        )
+    }
+
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -70,6 +84,14 @@ dependencies {
     implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.compose.runtime.livedata)
 
+    // Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // ---------- KSP (Kotlin Symbol Processing) ----------
+    ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+
     // ---------- Test Dependencies ----------
     testImplementation(libs.junit)
     testImplementation(libs.androidx.core.testing)
@@ -89,7 +111,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = "com.tnm.android.core"
                 artifactId = "ui-library"
-                version = "1.0.0"
+                version = "1.0.2"
                 from(components["release"])
             }
         }
@@ -97,10 +119,10 @@ afterEvaluate {
         repositories {
             maven {
                 name = "GitHub"
-                url = uri("https://maven.pkg.github.com/mrkivan/ui-library")
+                url = uri("https://maven.pkg.github.com/mrkivan/android-compose-ui-lib")
                 credentials {
-                    username = System.getenv("GITHUB_ACTOR") ?: "mrkivan"
-                    password = System.getenv("GITHUB_TOKEN") ?: ""
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
                 }
             }
         }

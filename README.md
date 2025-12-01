@@ -24,7 +24,7 @@ Add the dependency to your app-level `build.gradle.kts` (or `build.gradle`):
 
 ```kotlin
 dependencies {
-    implementation("com.tnm.android.core:u i-lib:1.0.0")  // Replace with actual version
+    implementation("com.tnm.android.core:ui-library:1.0.0")
 }
 ```
 
