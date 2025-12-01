@@ -19,16 +19,25 @@ spacers, date/time pickers, and text utilities. Designed for reusability in any 
 - **Utils**: Spacers, text components, and date/time pickers.
 
 ## Installation
-
-Add the dependency to your app-level `build.gradle.kts` (or `build.gradle`):
+- 1st update your `settings.gradle.kts` and configs environment variables to fetch the lib from gitHub release 
+- Than Add the dependency to your app-level `build.gradle.kts`:
 
 ```kotlin
+//settings.gradle.kts  
+maven {
+    url = uri("https://maven.pkg.github.com/mrkivan/android-compose-ui-lib")
+    credentials {
+        username = System.getenv("GITHUB_ACTOR") ?: (extra["gpr.user"] as String?) ?: ""
+        password = System.getenv("GITHUB_TOKEN") ?: (extra["gpr.key"] as String?) ?: ""
+    }
+}
+//build.gradle.kts 
 dependencies {
-    implementation("com.tnm.android.core:ui-library:1.0.0")
+    implementation("com.tnm.android.core:ui-library:1.0.2")
 }
 ```
 
-Sync your project. Ensure you have Jetpack Compose dependencies (e.g., `androidx.compose.material3:material3`).
+Sync your project. Ensure you have all latest Jetpack Compose dependencies (e.g., `androidx.compose.material3:material3`).
 
 ## Usage
 
