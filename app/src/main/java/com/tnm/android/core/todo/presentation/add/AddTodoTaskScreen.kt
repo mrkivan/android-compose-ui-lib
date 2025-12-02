@@ -15,11 +15,20 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.tnm.android.core.todo.presentation.AppTodoTaskDestinations
+import com.tnm.android.core.todo.presentation.NavKeys
+import com.tnm.android.core.todo.presentation.spinnerScreen.TestSpinnerData
 import com.tnm.android.core.ui.state.AppUiState
 import com.tnm.android.core.ui.view.AppToolbarConfig
 import com.tnm.android.core.ui.view.BaseCardView
@@ -29,6 +38,11 @@ import com.tnm.android.core.ui.view.TvSelectableText
 import com.tnm.android.core.ui.view.TvTitleCustomBold
 import com.tnm.android.core.ui.view.showAppDatePicker
 import com.tnm.android.core.ui.view.showAppTimePicker
+import com.tnm.android.core.ui.view.spinner.SmartSpinner
+import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
+import com.tnm.android.core.ui.view.spinner.config.SpinnerDisplayType
+import com.tnm.android.core.ui.view.spinner.config.SpinnerNavKeys
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -40,19 +54,88 @@ fun AddTodoTaskScreen(
     screenData: AddTodoTaskState?,
 ) {
     val context = LocalContext.current
+
+    var selectedCountry by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var selectedHobbies by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val spinnerPlaceHolder1 by remember(selectedCountry) {
+        derivedStateOf {
+            if (selectedCountry.isEmpty())
+                "Select Country"
+            else selectedCountry.joinToString(", ") { it }
+        }
+    }
+    val spinnerPlaceHolder2 by remember(selectedHobbies) {
+        derivedStateOf {
+            if (selectedHobbies.isEmpty())
+                "Select Hobbies"
+            else selectedHobbies.joinToString(", ") { it }
+        }
+    }
+    // ---------------------------
+    // FIXED: Proper Safe Collection of SavedStateHandle Set
+    // ---------------------------
+    val selectedAnimalsStateFlow =
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow<ArrayList<TestSpinnerData>>(
+                SpinnerNavKeys.DATA_KEY_SELECTED_ITEMS,
+                arrayListOf()
+            )
+
+    val selectedAnimals by (selectedAnimalsStateFlow
+        ?.map { it.toSet() }
+        ?.collectAsState(initial = emptySet())
+        ?: remember { mutableStateOf(emptySet()) })
+
+    // ---------------------------
+    // FIXED LABEL: Only recomposes when selectedAnimals changes
+    // ---------------------------
+    val fullScreenSpinnerPlaceHolder by remember(selectedAnimals) {
+        derivedStateOf {
+            if (selectedAnimals.isEmpty())
+                "Select Animals on Full Screen"
+            else selectedAnimals.joinToString(", ") { it.title }
+        }
+    }
+
+    val spinnerConfig = SmartSpinnerConfig<TestSpinnerData>(
+        widgetTitle = "Select Animals on Full Screen",
+        widgetPlaceholder = fullScreenSpinnerPlaceHolder,
+        spinnerType = SpinnerDisplayType.FullScreen,
+        multiSelectEnable = true,
+    )
+
+    val animals = listOf("Dog", "Cat", "Elephant", "Tiger", "Lion")
+
+    val animalDataList: List<TestSpinnerData> =
+        animals.mapIndexed { index, name ->
+            TestSpinnerData(
+                id = index + 1,
+                title = name
+            )
+        }
+
+    // ---------------------------
+    // VIEWMODEL LISTENERS (UNCHANGED)
+    // ---------------------------
     LaunchedEffect(Unit) {
 
         viewModel.handleIntent(AddTodoTaskIntent.LoadData(screenData))
 
         launch {
             viewModel.notificationMessage.collect { message ->
-                if (!message.isNullOrEmpty()) Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                if (!message.isNullOrEmpty()) {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
         launch {
-            viewModel.navigateToHome.collect { navController.navigateUp() }
+            viewModel.navigateToHome.collect {
+                navController.navigateUp()
+            }
         }
+
         launch {
             viewModel.showWarningDialog.collect {
                 // TODO
@@ -63,19 +146,20 @@ fun AddTodoTaskScreen(
     BackHandler {
         viewModel.handleIntent(AddTodoTaskIntent.ShowWarningPopup)
     }
+
+    // ---------------------------
+    // UI
+    // ---------------------------
     PlaceholderScaffold(
         toolbarConfig = AppToolbarConfig(
-            title = "Add TodoTask",
+            title = "Widget Showcase",
             navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
-            onNavigationClick = {
-                // TODO
-                navController.navigateUp()
-            },
+            onNavigationClick = { navController.navigateUp() },
         ),
         uiState = AppUiState.Success(true),
         modifier = Modifier,
         onRetryClicked = {
-            viewModel.handleIntent(intent = AddTodoTaskIntent.LoadData())
+            viewModel.handleIntent(AddTodoTaskIntent.LoadData())
         }
     ) { _, data ->
 
@@ -85,47 +169,136 @@ fun AddTodoTaskScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
+            // ---------------------------
+            // COUNTRY SPINNER
+            // ---------------------------
+            item {
+
+                SmartSpinner(
+                    config = SmartSpinnerConfig(
+                        widgetTitle = "Select Country",
+                        widgetPlaceholder = spinnerPlaceHolder1,
+                        spinnerType = SpinnerDisplayType.Dialog,
+                        searchable = true,
+                        searchPlaceHolder = "Search by country",
+                        onResult = { selectedCountry = it },
+                        rowLabel = { it },
+                    ),
+                    dataItems = listOf(
+                        "Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh",
+                        "Bhutan", "Brunei", "Cambodia", "China", "Cyprus",
+                        "Georgia", "India", "Indonesia", "Iran", "Iraq",
+                        "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait",
+                        "Kyrgyzstan", "Laos", "Lebanon", "Malaysia", "Maldives",
+                        "Mongolia", "Myanmar", "Nepal", "North Korea", "Oman"
+                    ),
+                    selectedItems = selectedCountry
+                )
+            }
+
+            // ---------------------------
+            // HOBBIES SPINNER
+            // ---------------------------
+            item {
+
+                SmartSpinner(
+                    config = SmartSpinnerConfig(
+                        widgetTitle = "Select Hobbies",
+                        widgetPlaceholder = spinnerPlaceHolder2,
+                        spinnerType = SpinnerDisplayType.BottomSheet,
+                        multiSelectEnable = true,
+                        onResult = { selectedHobbies = it },
+                        rowLabel = { it },
+                    ),
+                    dataItems = listOf("Travel", "Coding", "Music", "Movies", "Cooking"),
+                    selectedItems = selectedHobbies
+                )
+            }
+
+            // ---------------------------
+            // ANIMALS FULL SCREEN SPINNER
+            // ---------------------------
+            item {
+                SmartSpinner(
+                    config = spinnerConfig,
+                    dataItems = animalDataList,
+                    selectedItems = selectedAnimals,
+                    navigateToFullScreen = {
+
+                        // FIXED: savedStateHandle always stores ArrayList
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(
+                                SpinnerNavKeys.DATA_KEY_SPINNER_ITEMS,
+                                ArrayList(animalDataList)
+                            )
+
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(
+                                SpinnerNavKeys.DATA_KEY_SELECTED_ITEMS,
+                                ArrayList(selectedAnimals)
+                            )
+
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(
+                                NavKeys.DATA_KEY_SPINNER_CONFIG,
+                                spinnerConfig
+                            )
+
+                        navController.navigate(
+                            AppTodoTaskDestinations.ROUTE_TEST_SPINNER_SCREEN
+                        )
+                    }
+                )
+            }
+
+            // ---------------------------
+            // DATE + TIME PICKER
+            // ---------------------------
             item {
                 TvTitleCustomBold(text = "Select Date")
             }
             item {
                 GetDatePicker(
-                    validateDate = { date -> viewModel.validateDate() },
-                    onDateSelected = { date ->
-                        // TODO
-                    })
+                    validateDate = { viewModel.validateDate() },
+                    onDateSelected = { date -> }
+                )
             }
             item {
                 TvTitleCustomBold(text = "Select Time")
             }
             item {
                 GetTimePicker(
-                    validateTime = { time ->
-                        true
-                    },
-                    onTimeSelected = { time ->
-                        // TODO
-                    })
+                    validateTime = { true },
+                    onTimeSelected = { time -> }
+                )
             }
         }
     }
 }
 
-
 @Composable
 private fun GetDatePicker(
-    selectedDate: LocalDate? = null,
+    previousDate: LocalDate? = null,
     enableEdit: Boolean = true,
     validateDate: (LocalDate) -> Boolean,
     onDateSelected: (LocalDate) -> Unit
 ) {
     val context = LocalContext.current
+    var selectedDate by remember { mutableStateOf(previousDate?.toString()) }
+
     BaseCardView(
         modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
         onClick = {
             showAppDatePicker(
                 validateDate = validateDate,
-                onDateSelected = onDateSelected,
+                onDateSelected = {
+                    selectedDate = it.toString()
+                    onDateSelected(it)
+                },
                 context = context
             )
         },
@@ -136,7 +309,7 @@ private fun GetDatePicker(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TvSelectableText(
-                    value = selectedDate?.toString(),
+                    value = selectedDate,
                     placeholder = "Select Date",
                     modifier = Modifier.weight(1f)
                 )
@@ -155,19 +328,24 @@ private fun GetDatePicker(
 
 @Composable
 private fun GetTimePicker(
-    selectedTime: LocalTime? = null,
+    previousTime: LocalTime? = null,
     enableEdit: Boolean = true,
     validateTime: (LocalTime) -> Boolean,
     onTimeSelected: (LocalTime) -> Unit
 ) {
+    var selectedTime by remember { mutableStateOf(previousTime?.toString()) }
+
     val context = LocalContext.current
     BaseCardView(
         modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
         onClick = {
             showAppTimePicker(
                 validateTime = { time -> validateTime(time) },
-                onSelectedTime = { time -> onTimeSelected(time) },
-                selectedTime = selectedTime,
+                onSelectedTime = { time ->
+                    selectedTime = time.toString()
+                    onTimeSelected(time)
+                },
+                selectedTime = previousTime,
                 context = context
             )
         },
@@ -178,12 +356,10 @@ private fun GetTimePicker(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TvSelectableText(
-                    value = selectedTime?.toString(),
+                    value = selectedTime,
                     placeholder = "Select Time",
                     modifier = Modifier.weight(1f)
                 )
-
-
                 SpacerWidthLarge()
                 Icon(
                     imageVector = Icons.Default.Timer,

@@ -2,4 +2,8 @@
 <resources>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_retry">Retry</string>
+    <string name="search">Search</string>
+    <string name="done">Done</string>
+    <string name="search_empty">No items found!</string>
+
 </resources>

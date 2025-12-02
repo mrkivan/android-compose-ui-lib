@@ -1,5 +1,7 @@
 package com.tnm.android.core.ui.view
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +39,20 @@ fun TvTitleSmallBold(
 }
 
 @Composable
+fun TvTitleLarge(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.titleLarge,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
 fun TvTitleMedium(
     text: String,
     modifier: Modifier = Modifier
@@ -68,14 +84,16 @@ fun TvTitleMediumBold(
 @Composable
 fun TvBodyMedium(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
     Text(
         text = text,
         modifier = modifier,
         style = MaterialTheme.typography.bodyMedium,
         maxLines = 2,
-        overflow = TextOverflow.Ellipsis
+        overflow = TextOverflow.Ellipsis,
+        color = color
     )
 }
 
@@ -88,6 +106,30 @@ fun TvBodyLarge(
         text = text,
         modifier = modifier,
         style = MaterialTheme.typography.bodyLarge
+    )
+}
+
+@Composable
+fun TvHeadlineLarge(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineLarge
+    )
+}
+
+@Composable
+fun TvHeadlineMedium(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineMedium
     )
 }
 
@@ -135,5 +177,21 @@ fun TvSelectableText(
         color = color,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun PlaceHolderView(
+    placeholder: String,
+    fontSize: TextUnit = 16.sp
+) {
+
+    Text(
+        text = placeholder,
+        style = LocalTextStyle.current.copy(
+            fontSize = fontSize,
+            color = Color.Black.copy(alpha = 0.3f)
+        ),
+        modifier = Modifier.fillMaxWidth()
     )
 }
