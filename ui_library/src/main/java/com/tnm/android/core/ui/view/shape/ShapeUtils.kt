@@ -1,4 +1,4 @@
-package com.tnm.android.core.ui.view
+package com.tnm.android.core.ui.view.shape
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background

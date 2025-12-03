@@ -1,4 +1,4 @@
-package com.tnm.android.core.ui.view
+package com.tnm.android.core.ui.view.extensions
 
 import androidx.compose.ui.graphics.Color
 

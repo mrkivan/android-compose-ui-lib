@@ -23,8 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tnm.android.core.ui.R
 import com.tnm.android.core.ui.view.AppSearchBar
-import com.tnm.android.core.ui.view.SpacerHeightMedium
-import com.tnm.android.core.ui.view.TvBodyMedium
+import com.tnm.android.core.ui.view.shape.SpacerHeightMedium
+import com.tnm.android.core.ui.view.textView.TvBodyMedium
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 
 @Composable

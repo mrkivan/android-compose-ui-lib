@@ -23,7 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tnm.android.core.ui.R
-import com.tnm.android.core.ui.view.TvHeadlineMedium
+import com.tnm.android.core.ui.view.textView.TvHeadlineMedium
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 
 @Composable

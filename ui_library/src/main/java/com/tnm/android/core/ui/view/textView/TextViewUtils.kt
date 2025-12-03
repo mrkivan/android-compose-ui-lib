@@ -1,4 +1,4 @@
-package com.tnm.android.core.ui.view
+package com.tnm.android.core.ui.view.textView
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LocalTextStyle
@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.tnm.android.core.ui.view.extensions.getInactiveColor
 
 // -------------------------------
 //      TITLE TEXTS

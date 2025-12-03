@@ -1,5 +1,6 @@
-package com.tnm.android.core.ui.view
+package com.tnm.android.core.ui.view.shape
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -10,7 +11,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DashedDivider() {
-    androidx.compose.foundation.Canvas(
+    Canvas(
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnm.android.core.ui.R
+import com.tnm.android.core.ui.view.textView.PlaceHolderView
 
 @Composable
 fun AppSearchBar(

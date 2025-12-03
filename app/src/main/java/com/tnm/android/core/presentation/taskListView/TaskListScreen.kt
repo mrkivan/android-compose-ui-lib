@@ -29,10 +29,10 @@ import androidx.navigation.NavHostController
 import com.tnm.android.core.data.TodoTaskStatus
 import com.tnm.android.core.domain.TodoTask
 import com.tnm.android.core.ui.view.AppToolbarConfig
-import com.tnm.android.core.ui.view.BaseCardView
-import com.tnm.android.core.ui.view.PlaceholderScaffold
-import com.tnm.android.core.ui.view.SpacerWidthMedium
-import com.tnm.android.core.ui.view.TvBodyMedium
+import com.tnm.android.core.ui.view.card.BaseCardView
+import com.tnm.android.core.ui.view.scaffold.PlaceholderScaffold
+import com.tnm.android.core.ui.view.shape.SpacerWidthMedium
+import com.tnm.android.core.ui.view.textView.TvBodyMedium
 
 @Composable
 fun TaskListScreen(

@@ -1,4 +1,4 @@
-package com.tnm.android.core.ui.view
+package com.tnm.android.core.ui.view.scaffold
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tnm.android.core.ui.R
 import com.tnm.android.core.ui.state.AppUiState
+import com.tnm.android.core.ui.view.AppToolbarConfig
+import com.tnm.android.core.ui.view.AppTopAppBar
+import com.tnm.android.core.ui.view.shape.SpacerWidthSmall
 
 @Composable
 fun <T> PlaceholderScaffold(

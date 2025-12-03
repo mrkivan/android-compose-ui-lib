@@ -1,4 +1,4 @@
-package com.tnm.android.core.ui.view
+package com.tnm.android.core.ui.view.dialog
 
 import android.app.DatePickerDialog
 import android.content.Context

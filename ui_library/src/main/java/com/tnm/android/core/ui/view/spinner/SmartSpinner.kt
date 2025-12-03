@@ -12,9 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.tnm.android.core.ui.view.BaseCardView
-import com.tnm.android.core.ui.view.SpacerWidthLarge
-import com.tnm.android.core.ui.view.TvSelectableText
+import com.tnm.android.core.ui.view.card.BaseCardView
+import com.tnm.android.core.ui.view.shape.SpacerWidthLarge
+import com.tnm.android.core.ui.view.textView.TvSelectableText
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 import com.tnm.android.core.ui.view.spinner.config.SpinnerDisplayType
 import com.tnm.android.core.ui.view.spinner.containers.SpinnerBottomSheet

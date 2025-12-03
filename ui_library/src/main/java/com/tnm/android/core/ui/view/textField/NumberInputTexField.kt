@@ -1,4 +1,4 @@
-package com.tnm.android.core.ui.view
+package com.tnm.android.core.ui.view.textField
 
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -10,9 +10,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.tnm.android.core.ui.view.SpacerHeightMedium
-import com.tnm.android.core.ui.view.TvBodyMedium
-import com.tnm.android.core.ui.view.TvTitleLarge
+import com.tnm.android.core.ui.view.shape.SpacerHeightMedium
+import com.tnm.android.core.ui.view.textView.TvBodyMedium
+import com.tnm.android.core.ui.view.textView.TvTitleLarge
 
 @Composable
 fun SpinnerDefaultRow(
