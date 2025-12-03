@@ -1,5 +1,6 @@
 package com.tnm.android.core.ui.view
 
+import android.R
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +33,10 @@ fun AppTopAppBar(
 ) {
     TopAppBar(
         title = {
-            ToolbarTitle(toolbarConfig.title)
+            TvTitleMedium(
+                text = toolbarConfig.title,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         },
         navigationIcon = {
             toolbarConfig.navigationIcon?.let { icon ->

@@ -12,42 +12,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
-@Composable
-fun ToolbarTitle(title: String, modifier: Modifier = Modifier) {
-    Text(
-        text = title,
-        modifier = modifier,
-        style = MaterialTheme.typography.titleMedium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}
-
-@Composable
-fun TvTitleSmallBold(
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = text,
-        modifier = modifier,
-        style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.Bold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}
+// -------------------------------
+//      TITLE TEXTS
+// -------------------------------
 
 @Composable
 fun TvTitleLarge(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Text(
         text = text,
         modifier = modifier,
         style = MaterialTheme.typography.titleLarge,
-        maxLines = 1,
+        color = color,
+        maxLines = Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis
     )
 }
@@ -55,13 +35,49 @@ fun TvTitleLarge(
 @Composable
 fun TvTitleMedium(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Text(
         text = text,
         modifier = modifier,
         style = MaterialTheme.typography.titleMedium,
-        maxLines = 1,
+        color = color,
+        maxLines = Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun TvTitleSmall(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.titleSmall,
+        color = color,
+        maxLines = Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+// ---- Bold versions ----
+
+@Composable
+fun TvTitleLargeBold(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+        color = color,
+        maxLines = Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis
     )
 }
@@ -69,14 +85,104 @@ fun TvTitleMedium(
 @Composable
 fun TvTitleMediumBold(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Text(
         text = text,
         modifier = modifier,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        maxLines = 1,
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        color = color,
+        maxLines = Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun TvTitleSmallBold(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+        color = color,
+        maxLines = Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+// -------------------------------
+//      HEADLINE TEXTS
+// -------------------------------
+
+@Composable
+fun TvHeadlineLarge(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineLarge,
+        color = color,
+        maxLines = Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun TvHeadlineMedium(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineMedium,
+        color = color,
+        maxLines = Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun TvHeadlineSmall(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineSmall,
+        color = color,
+        maxLines = Int.MAX_VALUE,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+// -------------------------------
+//      BODY TEXTS
+//  maxLines = 2 for all body
+// -------------------------------
+
+@Composable
+fun TvBodyLarge(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.bodyLarge,
+        color = color,
+        maxLines = 2,
         overflow = TextOverflow.Ellipsis
     )
 }
@@ -91,57 +197,71 @@ fun TvBodyMedium(
         text = text,
         modifier = modifier,
         style = MaterialTheme.typography.bodyMedium,
+        color = color,
         maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun TvBodySmall(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.bodySmall,
+        color = color,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+// -------------------------------
+//      LABEL TEXTS
+// -------------------------------
+
+@Composable
+fun TvLabelLarge(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.labelLarge,
         color = color
     )
 }
 
 @Composable
-fun TvBodyLarge(
+fun TvLabelMedium(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
     Text(
         text = text,
         modifier = modifier,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.labelMedium,
+        color = color
     )
 }
 
 @Composable
-fun TvHeadlineLarge(
+fun TvLabelSmall(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
     Text(
         text = text,
         modifier = modifier,
-        style = MaterialTheme.typography.headlineLarge
-    )
-}
-
-@Composable
-fun TvHeadlineMedium(
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = text,
-        modifier = modifier,
-        style = MaterialTheme.typography.headlineMedium
-    )
-}
-
-@Composable
-fun TvHeadlineSmall(
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = text,
-        modifier = modifier,
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.labelSmall,
+        color = color
     )
 }
 
