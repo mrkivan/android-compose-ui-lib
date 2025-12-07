@@ -29,22 +29,26 @@ import androidx.navigation.NavHostController
 import com.tnm.android.core.AppTodoTaskDestinations
 import com.tnm.android.core.NavKeys
 import com.tnm.android.core.presentation.spinnerScreen.TestSpinnerData
-import com.tnm.android.core.ui.state.AppUiState
 import com.tnm.android.core.ui.view.AppToolbarConfig
-import com.tnm.android.core.ui.view.card.BaseCardView
-import com.tnm.android.core.ui.view.scaffold.PlaceholderScaffold
-import com.tnm.android.core.ui.view.shape.SpacerWidthLarge
 import com.tnm.android.core.ui.view.ToolbarAction
-import com.tnm.android.core.ui.view.textView.TvSelectableText
-import com.tnm.android.core.ui.view.textView.TvTitleCustomBold
+import com.tnm.android.core.ui.view.card.BaseCardView
 import com.tnm.android.core.ui.view.dialog.showAppDatePicker
 import com.tnm.android.core.ui.view.dialog.showAppTimePicker
+import com.tnm.android.core.ui.view.scaffold.PlaceholderScaffoldWithoutState
+import com.tnm.android.core.ui.view.shape.SpacerWidthLarge
 import com.tnm.android.core.ui.view.spinner.SmartSpinner
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 import com.tnm.android.core.ui.view.spinner.config.SpinnerDisplayType
 import com.tnm.android.core.ui.view.spinner.config.SpinnerNavKeys
+import com.tnm.android.core.ui.view.textField.NumberInputConfig
+import com.tnm.android.core.ui.view.textField.NumberInputTexField
+import com.tnm.android.core.ui.view.textField.TextInputConfig
+import com.tnm.android.core.ui.view.textField.TextInputField
+import com.tnm.android.core.ui.view.textView.TvSelectableText
+import com.tnm.android.core.ui.view.textView.TvTitleCustomBold
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -159,7 +163,7 @@ fun WidgetShowcaseScreen(
     // ---------------------------
     // UI
     // ---------------------------
-    PlaceholderScaffold(
+    PlaceholderScaffoldWithoutState(
         toolbarConfig = AppToolbarConfig(
             title = "Widget Showcase",
             actions = listOf(
@@ -171,13 +175,8 @@ fun WidgetShowcaseScreen(
                     }
                 ),
             )
-        ),
-        uiState = AppUiState.Success(true),
-        modifier = Modifier,
-        onRetryClicked = {
-            viewModel.handleIntent(WidgetShowcaseIntent.LoadData())
-        }
-    ) { _, data ->
+        )
+    ) { _ ->
 
         LazyColumn(
             modifier = Modifier
@@ -200,6 +199,7 @@ fun WidgetShowcaseScreen(
                         searchPlaceHolder = "Search by country",
                         onResult = { selectedCountry = it },
                         rowLabel = { it },
+                        designFlat = true
                     ),
                     dataItems = listOf(
                         "Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh",
@@ -276,6 +276,34 @@ fun WidgetShowcaseScreen(
             // ---------------------------
             item {
                 TvTitleCustomBold(text = "Select Date")
+            }
+            item {
+                NumberInputTexField(
+                    modifier = Modifier.padding(16.dp),
+                    initValue = BigDecimal("1000.00"),
+                    config = NumberInputConfig()
+                )
+            }
+            item {
+                NumberInputTexField(
+                    modifier = Modifier.padding(16.dp),
+                    initValue = BigDecimal("999.00"),
+                    config = NumberInputConfig(designFlat = true)
+                )
+            }
+            item {
+                TextInputField(
+                    modifier = Modifier.padding(16.dp),
+                    value = "Sample test input with false",
+                    config = TextInputConfig()
+                )
+            }
+            item {
+                TextInputField(
+                    modifier = Modifier.padding(16.dp),
+                    value = "Sample test input with true",
+                    config = TextInputConfig(designFlat = true)
+                )
             }
             item {
                 GetDatePicker(

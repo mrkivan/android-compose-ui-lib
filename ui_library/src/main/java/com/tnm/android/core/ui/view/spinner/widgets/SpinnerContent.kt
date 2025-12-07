@@ -4,13 +4,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,8 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tnm.android.core.ui.R
 import com.tnm.android.core.ui.view.AppSearchBar
-import com.tnm.android.core.ui.view.shape.SpacerHeightMedium
-import com.tnm.android.core.ui.view.textView.TvBodyMedium
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 
 @Composable
@@ -46,19 +47,16 @@ fun <T> SpinnerContent(
         if (!config.multiSelectEnable) {
             current.clear()
             current.add(item)
-
             onSelectionChanged(current)
-
             onDismiss.invoke(current)
         } else {
             if (current.contains(item)) current.remove(item)
             else current.add(item)
-
             onSelectionChanged(current)
         }
     }
 
-    LaunchedEffect(search) {
+    LaunchedEffect(search, dataItems) {
         filterItems =
             if (search.isBlank()) dataItems
             else dataItems.filter {
@@ -96,16 +94,17 @@ private fun SpinnerSearchBarSection(
         search = search,
         onSearchChange = onSearchChange,
         placeHolder = placeholder,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
     )
 
     HorizontalDivider(
-        modifier = Modifier.fillMaxWidth(),
         thickness = 1.dp,
-        color = MaterialTheme.colorScheme.outlineVariant
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
     )
 
-    SpacerHeightMedium()
+    Spacer(modifier = Modifier.height(12.dp))
 }
 
 @Composable
@@ -120,10 +119,14 @@ private fun <T> SpinnerListSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 32.dp),
+                .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
-            TvBodyMedium(text = stringResource(R.string.search_empty))
+            Text(
+                text = stringResource(R.string.search_empty),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         return
     }
@@ -135,9 +138,8 @@ private fun <T> SpinnerListSection(
                 isSelected = selectedItems.contains(item),
                 config = config,
                 onToggle = onToggle,
-                itemContent = itemContent,
-
-                )
+                itemContent = itemContent
+            )
         }
     }
 }
@@ -155,25 +157,24 @@ private fun <T> SpinnerItemRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onToggle(item) }
-                .padding(vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (itemContent != null) {
-                itemContent.invoke(item, isSelected)
+                itemContent(item, isSelected)
             } else {
                 SpinnerDefaultRow(
                     label = config.rowLabel(item),
                     isSelected = isSelected,
-                    isMultiSelectEnable = config.multiSelectEnable,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 16.dp)
+                    isMultiSelectEnable = config.multiSelectEnable
                 )
             }
         }
 
         HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
             thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

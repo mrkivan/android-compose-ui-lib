@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,38 +30,38 @@ fun <T> SpinnerDialog(
     var newSelectedItems by remember { mutableStateOf(selectedItems) }
 
     Dialog(
-        onDismissRequest = {
-            onDismiss.invoke(newSelectedItems)
-        }
+        onDismissRequest = { onDismiss(newSelectedItems) }
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .heightIn(max = 800.dp)
-                .fillMaxHeight(0.85f),
-            shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.background
+                .fillMaxWidth(0.96f)
+                .fillMaxHeight(0.85f)
+                .padding(4.dp), // small edge padding for elevated dialog
+            shape = MaterialTheme.shapes.extraLarge,
+            tonalElevation = 8.dp,
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 // Top Bar
                 SpinnerTopBar(
                     config = config,
-                    onDismiss = { onDismiss.invoke(newSelectedItems) },
-                    modifier = Modifier.padding(top = 12.dp)
+                    onDismiss = { onDismiss(newSelectedItems) },
                 )
+
+                // Content
                 SpinnerContent(
                     config = config,
-                    onSelectionChanged = {
-                        newSelectedItems = it
-                    },
                     dataItems = dataItems,
                     selectedItems = newSelectedItems,
                     itemContent = itemContent,
-                    onDismiss = { onDismiss.invoke(newSelectedItems) },
+                    onDismiss = { onDismiss(newSelectedItems) },
+                    onSelectionChanged = { newSelectedItems = it },
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

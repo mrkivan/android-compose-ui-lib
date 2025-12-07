@@ -12,6 +12,7 @@ data class SmartSpinnerConfig<T>(
     val searchPlaceHolder: String? = null,
     val multiSelectEnable: Boolean = false,
     val spinnerType: SpinnerDisplayType = SpinnerDisplayType.Dialog,
+    val designFlat: Boolean = false,
     @IgnoredOnParcel
     val rowLabel: (T) -> String = { it.toString() },
     @IgnoredOnParcel

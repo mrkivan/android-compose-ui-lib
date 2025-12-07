@@ -2,6 +2,7 @@ package com.tnm.android.core.ui.view.card
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 
@@ -12,5 +13,8 @@ object AppCardDefaults {
     fun elevation() = CardDefaults.cardElevation(defaultElevation = 4.dp)
 
     @Composable
-    fun colors() = CardDefaults.cardColors()
+    fun colors() = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    )
 }

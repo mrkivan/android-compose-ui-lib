@@ -2,14 +2,12 @@ package com.tnm.android.core.ui.view.spinner.containers
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,44 +31,38 @@ fun <T> SpinnerBottomSheet(
     var newSelectedItems by remember { mutableStateOf(selectedItems) }
 
     ModalBottomSheet(
-        onDismissRequest = { onDismiss.invoke(newSelectedItems) },
+        onDismissRequest = { onDismiss(newSelectedItems) },
         containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        tonalElevation = 4.dp
+        tonalElevation = 8.dp
     ) {
 
-        Surface(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.75f)
-                .padding(top = 4.dp),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            color = MaterialTheme.colorScheme.background,
-            tonalElevation = 2.dp
+                .fillMaxHeight(0.75f)          // Core height for bottom sheet body
+                .padding(horizontal = 16.dp)    // Standard Material padding
+                .padding(top = 8.dp)
         ) {
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                // Top Bar
-                SpinnerTopBar(
-                    config = config,
-                    onDismiss = { onDismiss.invoke(newSelectedItems) },
-                    modifier = Modifier.padding(top = 12.dp)
-                )
-                SpinnerContent(
-                    config = config,
-                    onSelectionChanged = {
-                        newSelectedItems = it
-                    },
-                    dataItems = dataItems,
-                    selectedItems = newSelectedItems,
-                    itemContent = itemContent,
-                    onDismiss = { onDismiss.invoke(newSelectedItems) },
-                )
-            }
+            // Header / Title
+            SpinnerTopBar(
+                config = config,
+                onDismiss = { onDismiss(newSelectedItems) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            // Main content list (search + rows)
+            SpinnerContent(
+                config = config,
+                dataItems = dataItems,
+                selectedItems = newSelectedItems,
+                onSelectionChanged = { newSelectedItems = it },
+                itemContent = itemContent,
+                onDismiss = { onDismiss(newSelectedItems) },
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
