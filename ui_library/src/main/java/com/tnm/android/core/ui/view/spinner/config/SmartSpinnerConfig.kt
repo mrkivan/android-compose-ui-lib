@@ -1,6 +1,7 @@
 package com.tnm.android.core.ui.view.spinner.config
 
 import android.os.Parcelable
+import com.tnm.android.core.ui.view.MAX_WIDGET_HEIGHT
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -13,6 +14,7 @@ data class SmartSpinnerConfig<T>(
     val multiSelectEnable: Boolean = false,
     val spinnerType: SpinnerDisplayType = SpinnerDisplayType.Dialog,
     val designFlat: Boolean = false,
+    val maxHeight: Int = MAX_WIDGET_HEIGHT,
     @IgnoredOnParcel
     val rowLabel: (T) -> String = { it.toString() },
     @IgnoredOnParcel

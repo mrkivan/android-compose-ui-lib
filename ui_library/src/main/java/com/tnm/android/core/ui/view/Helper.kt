@@ -14,3 +14,7 @@ fun BigDecimal?.formatWithCommaDecimal(): String {
     val format = DecimalFormat("#,###.##")
     return format.format(this)
 }
+
+fun getAlpha(isEnable: Boolean): Float = (if (isEnable) 1f else 0.5f)
+
+const val MAX_WIDGET_HEIGHT = 88

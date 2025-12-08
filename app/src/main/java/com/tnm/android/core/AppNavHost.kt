@@ -5,10 +5,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.tnm.android.core.presentation.widgetShowcase.WidgetShowcaseRoute
-import com.tnm.android.core.presentation.taskListView.TaskListRoute
 import com.tnm.android.core.presentation.spinnerScreen.SpinnerFullScreenScreen
 import com.tnm.android.core.presentation.spinnerScreen.TestSpinnerData
+import com.tnm.android.core.presentation.taskListView.TaskListRoute
+import com.tnm.android.core.presentation.widgetShowcase.WidgetShowcaseRoute
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 import com.tnm.android.core.ui.view.spinner.config.SpinnerNavKeys
 

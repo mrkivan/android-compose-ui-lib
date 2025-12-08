@@ -224,10 +224,15 @@ fun WidgetShowcaseScreen(
                         widgetPlaceholder = spinnerPlaceHolder2,
                         spinnerType = SpinnerDisplayType.BottomSheet,
                         multiSelectEnable = true,
+                        designFlat = false,
                         onResult = { selectedHobbies = it },
                         rowLabel = { it },
                     ),
-                    dataItems = listOf("Travel", "Coding", "Music", "Movies", "Cooking"),
+                    dataItems = listOf(
+                        "Travel", "Coding", "Music", "Movies", "Cooking", "Photography",
+                        "Fitness", "Reading", "Gaming", "Sports", "Art", "Technology", "Food",
+                        "Health", "Finance", "Education", "Nature", "Fashion", "History", "DIY"
+                    ),
                     selectedItems = selectedHobbies
                 )
             }
@@ -381,6 +386,7 @@ private fun GetTimePicker(
 
     val context = LocalContext.current
     BaseCardView(
+        isEnable = true,
         modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
         onClick = {
             showAppTimePicker(
@@ -393,7 +399,6 @@ private fun GetTimePicker(
                 context = context
             )
         },
-        isEnable = enableEdit,
         bodyContent = {
             Row(
                 modifier = Modifier.padding(16.dp),
