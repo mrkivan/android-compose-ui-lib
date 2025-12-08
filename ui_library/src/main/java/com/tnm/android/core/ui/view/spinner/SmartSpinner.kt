@@ -103,7 +103,7 @@ fun <T> SmartSpinner(
             ) {
                 Text(
                     text = if (selectedItemsState.value.isEmpty()) config.widgetTitle
-                    else selectedItemsState.value.joinToString(", ") { it.toString() },
+                    else selectedItemsState.value.joinToString(", ") { config.rowLabel(it) },
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (selectedItemsState.value.isEmpty())
                         MaterialTheme.colorScheme.onSurfaceVariant
@@ -152,7 +152,7 @@ fun <T> SmartSpinner(
                 ) {
                     Text(
                         text = if (selectedItemsState.value.isEmpty()) config.widgetTitle
-                        else selectedItemsState.value.joinToString(", ") { it.toString() },
+                        else selectedItemsState.value.joinToString(", ") { config.rowLabel(it) },
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (selectedItemsState.value.isEmpty())
                             MaterialTheme.colorScheme.onSurfaceVariant

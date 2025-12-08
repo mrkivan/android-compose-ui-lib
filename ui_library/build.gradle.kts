@@ -100,7 +100,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = "com.tnm.android.core"
                 artifactId = "ui-library"
-                version = "1.0.8"
+                version = "1.0.12"
                 from(components["release"])
             }
         }

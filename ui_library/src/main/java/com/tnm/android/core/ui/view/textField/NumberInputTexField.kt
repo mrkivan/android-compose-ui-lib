@@ -32,11 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.math.BigDecimal
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 
 // ---------------------------- NumberInputTexField ----------------------------
@@ -47,8 +50,10 @@ fun NumberInputTexField(
     maxValue: BigDecimal? = null,
     config: NumberInputConfig,
 ) {
+    // FIX: Force Locale.US to ensure separators are always ',' and '.' regardless of Bangla device settings
+    val symbols = remember { DecimalFormatSymbols(Locale.US) }
     val pattern = if (config.withoutDecimal) "#,###" else "#,###.00"
-    val decimalFormatAlwaysTwo = remember { DecimalFormat(pattern) }
+    val decimalFormatAlwaysTwo = remember { DecimalFormat(pattern, symbols) }
 
     var textFieldValue by remember {
         mutableStateOf(
@@ -79,6 +84,7 @@ fun NumberInputTexField(
 
     LaunchedEffect(isFocused) {
         if (!isFocused) {
+            // Logic to clean up formatting when focus is lost
             val raw = textFieldValue.text.replace(",", "")
             val valueToFormat =
                 if (raw.isEmpty() && config.isRequired) BigDecimal.ZERO else raw.toBigDecimalOrNull()
@@ -86,7 +92,7 @@ fun NumberInputTexField(
                 val formatted = decimalFormatAlwaysTwo.format(valueToFormat)
                 textFieldValue = TextFieldValue(formatted, TextRange(formatted.length))
             } else if (!config.isRequired) {
-                textFieldValue = TextFieldValue("") // allow empty if not required
+                textFieldValue = TextFieldValue("")
             }
         }
     }
@@ -108,7 +114,11 @@ fun NumberInputTexField(
         TextField(
             value = textFieldValue,
             onValueChange = { newValue ->
-                val raw = newValue.text.replace(",", "")
+                // FIX START: Normalize Bangla/Arabic inputs to English immediately
+                val normalizedText = normalizeToEnglish(newValue.text)
+                // FIX END
+
+                val raw = normalizedText.replace(",", "")
 
                 if (!isValidInput(raw, config.maxLength)) return@TextField
 
@@ -141,6 +151,7 @@ fun NumberInputTexField(
                 }
                 .padding(contentPadding),
             textStyle = LocalTextStyle.current.copy(
+                localeList = LocaleList("en-US"), // This helps with rendering fonts
                 textAlign = config.textAlign,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -158,23 +169,44 @@ fun NumberInputTexField(
 }
 
 // ---------------------------- Helpers ----------------------------
+
+/**
+ * FIX: Converts Bangla (০-৯) and Arabic (٠-٩) digits to English (0-9).
+ */
+private fun normalizeToEnglish(text: String): String {
+    return text.map { char ->
+        when (char) {
+            in '٠'..'٩' -> char - '٠' + '0'.code
+            in '০'..'৯' -> char - '০' + '0'.code
+            else -> char
+        }
+    }.joinToString("")
+}
+
 @Suppress("RegExpSimplifiable")
 private fun isValidInput(raw: String, maxLength: Int): Boolean {
     if (raw.isEmpty()) return true
+    // Matches integer part up to maxLength, optional decimal part up to 2 digits
     val regex = Regex("^\\d{0,$maxLength}(\\.\\d{0,2})?$")
     return regex.matches(raw)
 }
 
 private fun formatFlexible(raw: String, withoutDecimal: Boolean): String {
+    // FIX: Always use US symbols to prevent crashes on non-US devices
+    val symbols = DecimalFormatSymbols(Locale.US)
+
     if (withoutDecimal) {
-        return DecimalFormat("#,###").format(raw.toBigDecimal())
+        val format = DecimalFormat("#,###", symbols)
+        return raw.toBigDecimalOrNull()?.let { format.format(it) } ?: raw
     }
+
     val parts = raw.split(".")
     val intPart = parts[0]
     val decimalPart = parts.getOrNull(1)
 
+    val format = DecimalFormat("#,###", symbols)
     val formattedInt = intPart.toBigIntegerOrNull()
-        ?.let { DecimalFormat("#,###").format(it) }
+        ?.let { format.format(it) }
         ?: ""
 
     return buildString {

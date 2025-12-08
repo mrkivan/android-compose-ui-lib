@@ -1,5 +1,6 @@
 package com.tnm.android.core.ui.view
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -9,6 +10,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.tnm.android.core.ui.view.extensions.DARK_MODE_TOPBAR_COLOR
 import com.tnm.android.core.ui.view.textView.TvTitleMedium
 
 data class AppToolbarConfig(
@@ -31,11 +33,23 @@ fun AppTopAppBar(
     toolbarConfig: AppToolbarConfig,
     modifier: Modifier = Modifier
 ) {
+    val isDark = isSystemInDarkTheme()
+    // Primary background based on theme
+    val backgroundColor =
+        if (isDark) DARK_MODE_TOPBAR_COLOR
+        else MaterialTheme.colorScheme.primary
+
+    // Text/icon color based on background
+    val contentColor =
+        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant
+        else MaterialTheme.colorScheme.onPrimary
+
+
     TopAppBar(
         title = {
             TvTitleMedium(
                 text = toolbarConfig.title,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = contentColor
             )
         },
         navigationIcon = {
@@ -44,7 +58,7 @@ fun AppTopAppBar(
                     Icon(
                         imageVector = icon,
                         contentDescription = toolbarConfig.navigationIconContentDescription,
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = contentColor
                     )
                 }
             }
@@ -55,16 +69,16 @@ fun AppTopAppBar(
                     Icon(
                         imageVector = action.icon,
                         contentDescription = action.contentDescription,
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = contentColor
                     )
                 }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = backgroundColor,
+            titleContentColor = contentColor,
+            navigationIconContentColor = contentColor,
+            actionIconContentColor = contentColor
         ),
         modifier = modifier
     )

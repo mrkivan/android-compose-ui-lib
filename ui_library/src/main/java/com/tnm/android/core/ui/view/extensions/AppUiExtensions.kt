@@ -9,3 +9,5 @@ fun getInactiveColor(
 ): Color {
     return if (data == null) inActiveColor else activeColor
 }
+
+val DARK_MODE_TOPBAR_COLOR = Color(0xFF1E1E1E)
