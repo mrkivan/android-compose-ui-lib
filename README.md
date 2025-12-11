@@ -36,6 +36,11 @@ dependencies {
     implementation("com.tnm.android.core:ui-library:1.0.2")
 }
 ```
+```bash
+./gradlew clean build
+
+./gradlew clean build :ui_library:publishReleasePublicationToGitHubRepository
+```
 
 Sync your project. Ensure you have all latest Jetpack Compose dependencies (e.g., `androidx.compose.material3:material3`).
 

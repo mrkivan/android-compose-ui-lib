@@ -1,7 +1,7 @@
 package com.tnm.android.core.ui.view.spinner.config
 
 import android.os.Parcelable
-import com.tnm.android.core.ui.view.MAX_WIDGET_HEIGHT
+import com.tnm.android.core.ui.AppConstants.MAX_WIDGET_HEIGHT
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 

@@ -21,8 +21,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.tnm.android.core.ui.view.MAX_WIDGET_HEIGHT
-import com.tnm.android.core.ui.view.getAlpha
+import com.tnm.android.core.ui.AppConstants.MAX_WIDGET_HEIGHT
+import com.tnm.android.core.ui.view.extensions.getAlpha
 
 @Composable
 fun BaseCardView(

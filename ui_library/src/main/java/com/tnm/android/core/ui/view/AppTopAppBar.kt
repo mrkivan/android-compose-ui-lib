@@ -10,7 +10,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.tnm.android.core.ui.view.extensions.DARK_MODE_TOPBAR_COLOR
+import com.tnm.android.core.ui.AppConstants.DARK_MODE_TOPBAR_COLOR
 import com.tnm.android.core.ui.view.textView.TvTitleMedium
 
 data class AppToolbarConfig(

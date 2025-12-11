@@ -19,8 +19,8 @@ android {
         applicationId = "com.tnm.android.core"
         minSdk = 26
         targetSdk = 36
-        versionCode = 16
-        versionName = "1.0.16"
+        versionCode = 17
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

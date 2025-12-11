@@ -1,6 +1,8 @@
 package com.tnm.android.core.ui.view.extensions
 
 import androidx.compose.ui.graphics.Color
+import java.math.BigDecimal
+import java.text.DecimalFormat
 
 fun getInactiveColor(
     data: Any?,
@@ -10,4 +12,16 @@ fun getInactiveColor(
     return if (data == null) inActiveColor else activeColor
 }
 
-val DARK_MODE_TOPBAR_COLOR = Color(0xFF1E1E1E)
+fun BigDecimal?.formatWithComma(): String {
+    if (this == null) return ""
+    val format = DecimalFormat("#,###")
+    return format.format(this)
+}
+
+fun BigDecimal?.formatWithCommaDecimal(): String {
+    if (this == null) return ""
+    val format = DecimalFormat("#,###.##")
+    return format.format(this)
+}
+
+fun getAlpha(isEnable: Boolean): Float = (if (isEnable) 1f else 0.5f)
