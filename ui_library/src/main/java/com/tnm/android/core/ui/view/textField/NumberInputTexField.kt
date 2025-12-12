@@ -1,8 +1,6 @@
 package com.tnm.android.core.ui.view.textField
 
 import android.content.res.Configuration
-import android.util.Log
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -41,7 +39,6 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-
 // ---------------------------- NumberInputTexField ----------------------------
 @Composable
 fun NumberInputTexField(
@@ -50,9 +47,8 @@ fun NumberInputTexField(
     maxValue: BigDecimal? = null,
     config: NumberInputConfig,
 ) {
-    // FIX: Force Locale.US to ensure separators are always ',' and '.' regardless of Bangla device settings
     val symbols = remember { DecimalFormatSymbols(Locale.US) }
-    val pattern = if (config.withoutDecimal) "#,###" else "#,###.00"
+    val pattern = if (config.withoutDecimal) "#,##0" else "#,##0.00"
     val decimalFormatAlwaysTwo = remember { DecimalFormat(pattern, symbols) }
 
     var textFieldValue by remember {
@@ -74,17 +70,11 @@ fun NumberInputTexField(
                 formatFlexible(it.toPlainString(), config.withoutDecimal),
                 TextRange(Int.MAX_VALUE)
             )
-        } ?: if (config.isRequired) {
-            val zeroFormatted = decimalFormatAlwaysTwo.format(BigDecimal.ZERO)
-            TextFieldValue(zeroFormatted, TextRange(zeroFormatted.length))
-        } else {
-            TextFieldValue("")
-        }
+        } ?: TextFieldValue("")
     }
 
     LaunchedEffect(isFocused) {
         if (!isFocused) {
-            // Logic to clean up formatting when focus is lost
             val raw = textFieldValue.text.replace(",", "")
             val valueToFormat =
                 if (raw.isEmpty() && config.isRequired) BigDecimal.ZERO else raw.toBigDecimalOrNull()
@@ -155,7 +145,7 @@ fun NumberInputTexField(
                 textAlign = config.textAlign,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isSystemInDarkTheme()) Color.White else Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             ),
             placeholder = {
                 config.placeholder?.let { PlaceHolderView(config) }
@@ -170,9 +160,6 @@ fun NumberInputTexField(
 
 // ---------------------------- Helpers ----------------------------
 
-/**
- * FIX: Converts Bangla (০-৯) and Arabic (٠-٩) digits to English (0-9).
- */
 private fun normalizeToEnglish(text: String): String {
     return text.map { char ->
         when (char) {
@@ -186,13 +173,11 @@ private fun normalizeToEnglish(text: String): String {
 @Suppress("RegExpSimplifiable")
 private fun isValidInput(raw: String, maxLength: Int): Boolean {
     if (raw.isEmpty()) return true
-    // Matches integer part up to maxLength, optional decimal part up to 2 digits
     val regex = Regex("^\\d{0,$maxLength}(\\.\\d{0,2})?$")
     return regex.matches(raw)
 }
 
 private fun formatFlexible(raw: String, withoutDecimal: Boolean): String {
-    // FIX: Always use US symbols to prevent crashes on non-US devices
     val symbols = DecimalFormatSymbols(Locale.US)
 
     if (withoutDecimal) {
@@ -220,20 +205,21 @@ private fun formatFlexible(raw: String, withoutDecimal: Boolean): String {
 
 private fun parseBigDecimal(raw: String, maxValue: BigDecimal?): BigDecimal? {
     val parsed = raw.toBigDecimalOrNull() ?: return null
-    Log.d("CurrencyTextInput", "parsed=$parsed maxValue: $maxValue")
     return if (maxValue == null || parsed <= maxValue) parsed else maxValue
 }
 
-// ---------------------------- Composables ----------------------------
+// ---------------------------- Composable ----------------------------
 @Composable
 private fun PlaceHolderView(config: NumberInputConfig) {
+    val placeholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+
     Text(
         text = config.placeholder.orEmpty(),
         style = LocalTextStyle.current.copy(
             textAlign = config.textAlign,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black.copy(alpha = 0.3f)
+            color = placeholderColor
         ),
         modifier = Modifier.fillMaxWidth()
     )
@@ -241,11 +227,13 @@ private fun PlaceHolderView(config: NumberInputConfig) {
 
 @Composable
 private fun TrailingLabelView(trailingLabel: String) {
+    val trailingColor = MaterialTheme.colorScheme.onSurfaceVariant
+
     Text(
         text = trailingLabel,
         style = MaterialTheme.typography.bodyLarge.copy(
             fontSize = 16.sp,
-            color = Color.Gray
+            color = trailingColor
         )
     )
 }

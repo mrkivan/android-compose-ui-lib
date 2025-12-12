@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SpendFlowSpinnerRow(
+fun SpinnerRowWithIcon(
     label: String,
     icon: ImageVector,
     modifier: Modifier = Modifier,
@@ -86,11 +86,11 @@ fun SpendFlowSpinnerRow(
 
 @Preview(showBackground = true)
 @Composable
-private fun PreviewSpendFlowSpinnerRow() {
+private fun PreviewSpinnerRowWithIcon() {
     Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             // --- 1. Selected State ---
-            SpendFlowSpinnerRow(
+            SpinnerRowWithIcon(
                 label = "Food & Dining (Selected)",
                 description = "Food & Dining Tested",
                 isSelected = true,
@@ -99,7 +99,7 @@ private fun PreviewSpendFlowSpinnerRow() {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // --- 2. Unselected State ---
-            SpendFlowSpinnerRow(
+            SpinnerRowWithIcon(
                 label = "Utilities (Unselected)",
                 isSelected = false,
                 icon = Icons.Filled.Settings,
@@ -108,7 +108,7 @@ private fun PreviewSpendFlowSpinnerRow() {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // --- 3. Another Unselected State ---
-            SpendFlowSpinnerRow(
+            SpinnerRowWithIcon(
                 label = "Travel",
                 isSelected = false,
                 icon = Icons.Filled.LocationOn,

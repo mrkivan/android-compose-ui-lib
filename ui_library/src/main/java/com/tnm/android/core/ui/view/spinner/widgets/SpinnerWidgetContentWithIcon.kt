@@ -32,7 +32,6 @@ import com.tnm.android.core.ui.AppConstants
 fun SpinnerWidgetContentWithIcon(
     label: String,
     icon: ImageVector,
-    maxHeight: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     description: String? = null,
@@ -46,7 +45,7 @@ fun SpinnerWidgetContentWithIcon(
                 indication = ripple(color = MaterialTheme.colorScheme.primary),
                 interactionSource = remember { MutableInteractionSource() }
             )
-            .height(maxHeight.dp),
+            .height(AppConstants.MAX_WIDGET_HEIGHT.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 2.dp,
         shadowElevation = 2.dp
@@ -102,7 +101,6 @@ private fun PreviewSpinnerWidgetContentWithIcon() {
             label = "Food & Dining (Selected)",
             description = "Food & Dining Tested",
             icon = Icons.Filled.Fastfood,
-            maxHeight = AppConstants.MAX_WIDGET_HEIGHT,
             onClick = {},
         )
     }

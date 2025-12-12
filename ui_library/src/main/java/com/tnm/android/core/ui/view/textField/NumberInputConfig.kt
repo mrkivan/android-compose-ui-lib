@@ -7,10 +7,10 @@ import java.math.BigDecimal
 data class NumberInputConfig(
     val maxLength: Int = 10,
     val onValueChange: (BigDecimal) -> Unit = {},
-    val trailingLabel: String? = "USD",
+    val trailingLabel: String? = null,
     val placeholder: String? = "0.00",
     val withoutDecimal: Boolean = false,
     val isRequired: Boolean = false,
-    val textAlign: TextAlign = TextAlign.End,
+    val textAlign: TextAlign = TextAlign.Start,
     val designFlat: Boolean = false
 )

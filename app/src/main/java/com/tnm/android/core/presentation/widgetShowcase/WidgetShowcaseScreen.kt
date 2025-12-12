@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.tnm.android.core.AppTodoTaskDestinations
@@ -284,14 +285,20 @@ fun WidgetShowcaseScreen(
             }
             item {
                 NumberInputTexField(
-                    modifier = Modifier.padding(16.dp),
+                    config = NumberInputConfig(
+                        withoutDecimal = false,
+                        isRequired = true,
+                    )
+                )
+            }
+            item {
+                NumberInputTexField(
                     initValue = BigDecimal("1000.00"),
                     config = NumberInputConfig()
                 )
             }
             item {
                 NumberInputTexField(
-                    modifier = Modifier.padding(16.dp),
                     initValue = BigDecimal("999.00"),
                     config = NumberInputConfig(designFlat = true)
                 )

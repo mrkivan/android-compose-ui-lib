@@ -38,7 +38,7 @@ fun <T> SmartSpinner(
     dataItems: List<T>,
     selectedItems: Set<T> = emptySet(),
     navigateToFullScreen: (() -> Unit)? = null,
-    widgetContent: (@Composable (selectedItems: Set<T>) -> Unit)? = null,
+    widgetContent: (@Composable (selectedItems: Set<T>, onClick: () -> Unit) -> Unit)? = null,
     itemContent: (@Composable (item: T, selected: Boolean) -> Unit)? = null,
 ) {
     val selectedItemsState = remember { mutableStateOf(selectedItems) }
@@ -86,17 +86,18 @@ fun <T> SmartSpinner(
             }
         )
     }
+    val triggerClick: () -> Unit = { showSpinner(config.spinnerType) }
 
     // Widget UI (Trigger)
     if (widgetContent != null) {
-        widgetContent(selectedItemsState.value)
+        widgetContent(selectedItemsState.value, triggerClick)
     } else {
         if (config.designFlat) {
             FlatSpinnerRow(
                 selectedItems = selectedItemsState.value,
                 title = config.widgetTitle,
                 maxHeight = config.maxHeight,
-                onClick = { showSpinner(config.spinnerType) },
+                onClick = triggerClick,
                 rowLabel = config.rowLabel
             )
         } else {
@@ -104,7 +105,7 @@ fun <T> SmartSpinner(
                 selectedItems = selectedItemsState.value,
                 title = config.widgetTitle,
                 maxHeight = config.maxHeight,
-                onClick = { showSpinner(config.spinnerType) },
+                onClick = triggerClick,
                 rowLabel = config.rowLabel
             )
         }
