@@ -200,7 +200,8 @@ fun WidgetShowcaseScreen(
                         searchPlaceHolder = "Search by country",
                         onResult = { selectedCountry = it },
                         rowLabel = { it },
-                        designFlat = true
+                        designFlat = true,
+                        isGrid = Pair(true, 3)
                     ),
                     dataItems = listOf(
                         "Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh",
@@ -223,16 +224,15 @@ fun WidgetShowcaseScreen(
                     config = SmartSpinnerConfig(
                         widgetTitle = "Select Hobbies",
                         widgetPlaceholder = spinnerPlaceHolder2,
-                        spinnerType = SpinnerDisplayType.BottomSheet,
-                        multiSelectEnable = true,
+                        spinnerType = SpinnerDisplayType.Dialog,
+                        multiSelectEnable = false,
                         designFlat = false,
                         onResult = { selectedHobbies = it },
                         rowLabel = { it },
+                        isGrid = Pair(true, 3)
                     ),
                     dataItems = listOf(
                         "Travel", "Coding", "Music", "Movies", "Cooking", "Photography",
-                        "Fitness", "Reading", "Gaming", "Sports", "Art", "Technology", "Food",
-                        "Health", "Finance", "Education", "Nature", "Fashion", "History", "DIY"
                     ),
                     selectedItems = selectedHobbies
                 )

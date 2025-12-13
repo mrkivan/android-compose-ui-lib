@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.compose.ui.unit)
+    implementation(libs.androidx.compose.ui.graphics)
 
     // ---------- Test Dependencies ----------
     testImplementation(libs.junit)
@@ -101,7 +102,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = "com.tnm.android.core"
                 artifactId = "ui-library"
-                version = "2.1.6"
+                version = "2.2.0"
                 from(components["release"])
             }
         }

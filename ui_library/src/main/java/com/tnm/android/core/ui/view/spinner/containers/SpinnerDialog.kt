@@ -1,9 +1,8 @@
 package com.tnm.android.core.ui.view.spinner.containers
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,9 +33,9 @@ fun <T> SpinnerDialog(
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth(0.96f)
-                .fillMaxHeight(0.85f)
-                .padding(4.dp), // small edge padding for elevated dialog
+                .fillMaxWidth()                 // take maximum width
+                .heightIn(max = 720.dp)         // wrap height with safe cap
+                .padding(4.dp),
             shape = MaterialTheme.shapes.extraLarge,
             tonalElevation = 8.dp,
             color = MaterialTheme.colorScheme.surface,
@@ -44,8 +43,7 @@ fun <T> SpinnerDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(4.dp)
             ) {
                 // Top Bar
                 SpinnerTopBar(
@@ -53,7 +51,7 @@ fun <T> SpinnerDialog(
                     onDismiss = { onDismiss(newSelectedItems) },
                 )
 
-                // Content
+                // Content (scrolls if too large)
                 SpinnerContent(
                     config = config,
                     dataItems = dataItems,
@@ -61,10 +59,12 @@ fun <T> SpinnerDialog(
                     itemContent = itemContent,
                     onDismiss = { onDismiss(newSelectedItems) },
                     onSelectionChanged = { newSelectedItems = it },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false) // key for wrap behavior
                 )
+
             }
         }
     }
 }
-

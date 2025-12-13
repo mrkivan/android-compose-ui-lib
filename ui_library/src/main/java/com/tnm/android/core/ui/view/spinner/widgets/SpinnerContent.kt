@@ -1,18 +1,23 @@
 package com.tnm.android.core.ui.view.spinner.widgets
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,7 +69,7 @@ fun <T> SpinnerContent(
             }
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier) {
 
         if (config.searchable) {
             SpinnerSearchBarSection(
@@ -131,50 +136,108 @@ private fun <T> SpinnerListSection(
         return
     }
 
-    LazyColumn {
-        items(items) { item ->
-            SpinnerItemRow(
-                item = item,
-                isSelected = selectedItems.contains(item),
-                config = config,
-                onToggle = onToggle,
-                itemContent = itemContent
-            )
+    val isGrid = config.isGrid.first
+    val gridSpanCount = config.isGrid.second.coerceAtLeast(1)
+
+    if (isGrid) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(gridSpanCount),
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items) { item ->
+                SpinnerItemView(
+                    item = item,
+                    isSelected = selectedItems.contains(item),
+                    isGrid = true,
+                    config = config,
+                    onToggle = onToggle,
+                    itemContent = itemContent
+                )
+            }
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(items) { item ->
+                SpinnerItemView(
+                    item = item,
+                    isSelected = selectedItems.contains(item),
+                    isGrid = false,
+                    config = config,
+                    onToggle = onToggle,
+                    itemContent = itemContent
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun <T> SpinnerItemRow(
+private fun <T> SpinnerItemView(
     item: T,
     isSelected: Boolean,
+    isGrid: Boolean,
     config: SmartSpinnerConfig<T>,
     onToggle: (T) -> Unit,
     itemContent: (@Composable (item: T, selected: Boolean) -> Unit)?,
 ) {
-    Column {
-        Row(
+    if (isGrid) {
+        // GRID ITEM
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onToggle(item) }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .clickable { onToggle(item) },
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = if (isSelected) 4.dp else 1.dp,
+            color = if (isSelected)
+                MaterialTheme.colorScheme.secondaryContainer
+            else
+                MaterialTheme.colorScheme.surface
         ) {
-            if (itemContent != null) {
-                itemContent(item, isSelected)
-            } else {
-                SpinnerDefaultRow(
-                    label = config.rowLabel(item),
-                    isSelected = isSelected,
-                    isMultiSelectEnable = config.multiSelectEnable
-                )
+            Column(
+                modifier = Modifier.padding(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (itemContent != null) {
+                    itemContent(item, isSelected)
+                } else {
+                    SpinnerDefaultCol(
+                        label = config.rowLabel(item),
+                        isSelected = isSelected,
+                        isMultiSelectEnable = config.multiSelectEnable
+                    )
+                }
             }
         }
+    } else {
+        // 📄 LIST ITEM
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onToggle(item) }
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (itemContent != null) {
+                    itemContent(item, isSelected)
+                } else {
+                    SpinnerDefaultRow(
+                        label = config.rowLabel(item),
+                        isSelected = isSelected,
+                        isMultiSelectEnable = config.multiSelectEnable
+                    )
+                }
+            }
 
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-            thickness = 1.dp,
-            modifier = Modifier.fillMaxWidth()
-        )
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                thickness = 1.dp
+            )
+        }
     }
 }

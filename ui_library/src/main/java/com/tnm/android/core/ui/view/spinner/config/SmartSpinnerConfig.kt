@@ -15,6 +15,7 @@ data class SmartSpinnerConfig<T>(
     val spinnerType: SpinnerDisplayType = SpinnerDisplayType.Dialog,
     val designFlat: Boolean = false,
     val maxHeight: Int = MAX_WIDGET_HEIGHT,
+    val isGrid: Pair<Boolean, Int> = Pair(false, 0),
     @IgnoredOnParcel
     val rowLabel: (T) -> String = { it.toString() },
     @IgnoredOnParcel
