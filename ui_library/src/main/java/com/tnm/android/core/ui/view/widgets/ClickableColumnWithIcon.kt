@@ -1,7 +1,6 @@
 package com.tnm.android.core.ui.view.widgets
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +31,7 @@ fun ClickableColumnWithIcon(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isDarkMode: Boolean = isSystemInDarkTheme()
+    isDarkMode: Boolean
 ) {
     val containerColor = if (isDarkMode) {
         MaterialTheme.colorScheme.surface
@@ -85,13 +84,15 @@ private fun PreviewClickableColumnWithIcon() {
                     label = "Savings",
                     icon = Icons.Filled.Star,
                     onClick = {},
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    isDarkMode = false
                 )
                 ClickableColumnWithIcon(
                     label = "Investments",
                     icon = Icons.AutoMirrored.Filled.List,
                     onClick = {},
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    isDarkMode = false
                 )
             }
 
@@ -100,7 +101,8 @@ private fun PreviewClickableColumnWithIcon() {
                     label = "Deposit",
                     icon = Icons.Filled.Add,
                     onClick = {},
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isDarkMode = false
                 )
             }
         }

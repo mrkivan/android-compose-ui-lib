@@ -1,5 +1,6 @@
 package com.tnm.android.core.presentation.taskListView
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +55,7 @@ fun TaskListScreen(
 
         uiState = uiState.value,
         modifier = Modifier,
+        isDarkMode = isSystemInDarkTheme(),
         onRetryClicked = {
             viewModel.handleIntent(TaskListIntent.LoadAllData)
         }

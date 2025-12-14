@@ -13,12 +13,16 @@ import com.tnm.android.core.ui.view.AppTopAppBar
 @Composable
 fun PlaceholderScaffoldWithoutState(
     toolbarConfig: AppToolbarConfig,
+    isDarkMode: Boolean,
     modifier: Modifier = Modifier,
     bodyContent: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         topBar = {
-            AppTopAppBar(toolbarConfig = toolbarConfig)
+            AppTopAppBar(
+                toolbarConfig = toolbarConfig,
+                isDarkMode = isDarkMode,
+            )
         },
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->

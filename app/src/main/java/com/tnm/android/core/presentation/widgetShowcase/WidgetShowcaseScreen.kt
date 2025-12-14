@@ -2,6 +2,7 @@ package com.tnm.android.core.presentation.widgetShowcase
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.tnm.android.core.AppTodoTaskDestinations
@@ -176,7 +176,8 @@ fun WidgetShowcaseScreen(
                     }
                 ),
             )
-        )
+        ),
+        isDarkMode = isSystemInDarkTheme(),
     ) { _ ->
 
         LazyColumn(
@@ -307,14 +308,16 @@ fun WidgetShowcaseScreen(
                 TextInputField(
                     modifier = Modifier.padding(16.dp),
                     value = "Sample test input with false",
-                    config = TextInputConfig()
+                    config = TextInputConfig(),
+                    isDarkMode = isSystemInDarkTheme(),
                 )
             }
             item {
                 TextInputField(
                     modifier = Modifier.padding(16.dp),
                     value = "Sample test input with true",
-                    config = TextInputConfig(designFlat = true)
+                    config = TextInputConfig(designFlat = true),
+                    isDarkMode = isSystemInDarkTheme(),
                 )
             }
             item {

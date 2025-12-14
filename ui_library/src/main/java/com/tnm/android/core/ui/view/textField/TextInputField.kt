@@ -1,7 +1,6 @@
 package com.tnm.android.core.ui.view.textField
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -34,7 +33,7 @@ fun TextInputField(
     value: String,
     config: TextInputConfig,
     enabled: Boolean = true,
-    isDarkMode: Boolean = isSystemInDarkTheme()
+    isDarkMode: Boolean
 ) {
     val focusManager = LocalFocusManager.current
     //var isFocused by remember { mutableStateOf(false) }
@@ -104,7 +103,8 @@ fun PreviewTextInputField() {
                     imeAction = ImeAction.Next,
                     designFlat = true
                 ),
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                isDarkMode = false,
             )
             Spacer(Modifier.height(16.dp))
             TextInputField(
@@ -114,7 +114,8 @@ fun PreviewTextInputField() {
                     imeAction = ImeAction.Next,
                     designFlat = false
                 ),
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                isDarkMode = false
             )
         }
     }

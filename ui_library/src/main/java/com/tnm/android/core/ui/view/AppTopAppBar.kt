@@ -1,6 +1,5 @@
 package com.tnm.android.core.ui.view
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,8 +30,8 @@ data class ToolbarAction(
 @Composable
 fun AppTopAppBar(
     toolbarConfig: AppToolbarConfig,
+    isDarkMode: Boolean,
     modifier: Modifier = Modifier,
-    isDarkMode: Boolean = isSystemInDarkTheme()
 ) {
 
     // Primary background based on theme

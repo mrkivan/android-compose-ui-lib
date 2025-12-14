@@ -1,7 +1,6 @@
 package com.tnm.android.core.ui.view.widgets
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,8 +31,8 @@ fun ClickableRowWithIcon(
     label: String,
     icon: ImageVector,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth(),
-    isDarkMode: Boolean = isSystemInDarkTheme()
+    modifier: Modifier = Modifier,
+    isDarkMode: Boolean
 ) {
     val containerColor = if (isDarkMode) {
         MaterialTheme.colorScheme.surface
@@ -42,6 +41,7 @@ fun ClickableRowWithIcon(
     }
     Card(
         modifier = modifier
+            .fillMaxWidth()
             .padding(8.dp)
             .clickable { onClick.invoke() },
         colors = CardDefaults.cardColors(containerColor = containerColor),
@@ -89,20 +89,23 @@ private fun PreviewClickableColumnWithIcon() {
                     label = "Transfer",
                     icon = Icons.Filled.Settings,
                     onClick = { /* Preview click action */ },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    isDarkMode = false
                 )
                 ClickableRowWithIcon(
                     label = "Pay Bills",
                     icon = Icons.Filled.Info,
                     onClick = { /* Preview click action */ },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    isDarkMode = false
                 )
             }
             ClickableRowWithIcon(
                 label = "Deposit",
                 icon = Icons.Filled.Add,
                 onClick = {},
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isDarkMode = false
             )
         }
     }

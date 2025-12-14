@@ -1,5 +1,6 @@
 package com.tnm.android.core.presentation.spinnerScreen
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -61,7 +62,8 @@ fun <T> SpinnerFullScreenScreen(
                             }
                         ) else null,
                     ),
-                )
+                ),
+                isDarkMode = isSystemInDarkTheme(),
             )
         },
     ) { innerPadding ->

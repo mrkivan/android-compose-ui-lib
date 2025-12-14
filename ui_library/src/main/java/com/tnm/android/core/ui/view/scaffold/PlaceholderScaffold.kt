@@ -29,13 +29,17 @@ import com.tnm.android.core.ui.view.shape.SpacerWidthSmall
 fun <T> PlaceholderScaffold(
     toolbarConfig: AppToolbarConfig,
     uiState: AppUiState<T>,
+    isDarkMode: Boolean,
     modifier: Modifier = Modifier,
     onRetryClicked: () -> Unit = {},
     bodyContent: @Composable (PaddingValues, T) -> Unit
 ) {
     Scaffold(
         topBar = {
-            AppTopAppBar(toolbarConfig = toolbarConfig)
+            AppTopAppBar(
+                toolbarConfig = toolbarConfig,
+                isDarkMode = isDarkMode,
+            )
         },
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
