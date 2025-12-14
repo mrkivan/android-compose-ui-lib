@@ -32,9 +32,10 @@ fun ClickableRowWithIcon(
     label: String,
     icon: ImageVector,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth()
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    isDarkMode: Boolean = isSystemInDarkTheme()
 ) {
-    val containerColor = if (isSystemInDarkTheme()) {
+    val containerColor = if (isDarkMode) {
         MaterialTheme.colorScheme.surface
     } else {
         MaterialTheme.colorScheme.surfaceContainerHigh

@@ -31,17 +31,18 @@ data class ToolbarAction(
 @Composable
 fun AppTopAppBar(
     toolbarConfig: AppToolbarConfig,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDarkMode: Boolean = isSystemInDarkTheme()
 ) {
-    val isDark = isSystemInDarkTheme()
+
     // Primary background based on theme
     val backgroundColor =
-        if (isDark) DARK_MODE_TOPBAR_COLOR
+        if (isDarkMode) DARK_MODE_TOPBAR_COLOR
         else MaterialTheme.colorScheme.primary
 
     // Text/icon color based on background
     val contentColor =
-        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant
+        if (isDarkMode) MaterialTheme.colorScheme.onSurfaceVariant
         else MaterialTheme.colorScheme.onPrimary
 
 

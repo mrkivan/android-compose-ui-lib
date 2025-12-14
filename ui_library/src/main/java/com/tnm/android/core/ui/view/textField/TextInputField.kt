@@ -34,6 +34,7 @@ fun TextInputField(
     value: String,
     config: TextInputConfig,
     enabled: Boolean = true,
+    isDarkMode: Boolean = isSystemInDarkTheme()
 ) {
     val focusManager = LocalFocusManager.current
     //var isFocused by remember { mutableStateOf(false) }
@@ -45,7 +46,7 @@ fun TextInputField(
     val contentPadding = if (config.designFlat) PaddingValues(horizontal = 0.dp, vertical = 4.dp)
     else PaddingValues(horizontal = 16.dp, vertical = 14.dp)
 
-    val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
+    val textColor = if (isDarkMode) Color.White else Color.Black
 
     Surface(
         modifier = modifier.fillMaxWidth(),

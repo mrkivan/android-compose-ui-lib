@@ -31,9 +31,10 @@ fun ClickableColumnWithIcon(
     label: String,
     icon: ImageVector,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDarkMode: Boolean = isSystemInDarkTheme()
 ) {
-    val containerColor = if (isSystemInDarkTheme()) {
+    val containerColor = if (isDarkMode) {
         MaterialTheme.colorScheme.surface
     } else {
         MaterialTheme.colorScheme.surfaceContainerHigh
