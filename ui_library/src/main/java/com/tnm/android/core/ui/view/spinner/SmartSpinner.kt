@@ -18,8 +18,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,8 +43,13 @@ fun <T> SmartSpinner(
     widgetContent: (@Composable (selectedItems: Set<T>, onClick: () -> Unit) -> Unit)? = null,
     itemContent: (@Composable (item: T, selected: Boolean) -> Unit)? = null,
 ) {
-    val selectedItemsState = remember { mutableStateOf(selectedItems) }
+    val selectedItemsState = rememberSaveable {
+        mutableStateOf(selectedItems)
+    }
 
+    LaunchedEffect(selectedItems) {
+        selectedItemsState.value = selectedItems
+    }
     val showDialog = remember { mutableStateOf(false) }
     val showBottomSheet = remember { mutableStateOf(false) }
 

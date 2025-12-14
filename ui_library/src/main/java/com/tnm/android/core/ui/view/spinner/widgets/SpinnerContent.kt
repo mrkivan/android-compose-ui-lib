@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tnm.android.core.ui.R
@@ -69,8 +70,7 @@ fun <T> SpinnerContent(
             }
     }
 
-    Column(modifier = modifier) {
-
+    Column(modifier = modifier.padding(vertical = 4.dp)) {
         if (config.searchable) {
             SpinnerSearchBarSection(
                 search = search,
@@ -78,7 +78,6 @@ fun <T> SpinnerContent(
                 placeholder = config.searchPlaceHolder.orEmpty()
             )
         }
-
         SpinnerListSection(
             items = filterItems,
             selectedItems = selectedItems,
@@ -192,9 +191,9 @@ private fun <T> SpinnerItemView(
                 .fillMaxWidth()
                 .clickable { onToggle(item) },
             shape = MaterialTheme.shapes.medium,
-            tonalElevation = if (isSelected) 4.dp else 1.dp,
+            tonalElevation = 4.dp,
             color = if (isSelected)
-                MaterialTheme.colorScheme.secondaryContainer
+                Color(0xFF4A4458).copy(alpha = 0.40f)
             else
                 MaterialTheme.colorScheme.surface
         ) {
