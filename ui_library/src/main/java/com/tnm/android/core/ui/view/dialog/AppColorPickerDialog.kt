@@ -8,6 +8,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,13 +29,18 @@ fun showColorPickerDialog(
     btnLabel: String,
     modifier: Modifier = Modifier
 ) {
+    // 🔑 Hold selected color INSIDE dialog
+    var currentColor by remember {
+        mutableStateOf(initialColor ?: Color.Red)
+    }
+
     Dialog(
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnClickOutside = false,
             dismissOnBackPress = false
         ),
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismiss
     ) {
         Surface(
             shape = MaterialTheme.shapes.medium,
@@ -41,6 +50,7 @@ fun showColorPickerDialog(
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+
                 Text(
                     text = dialogLabel,
                     style = MaterialTheme.typography.titleMedium
@@ -49,16 +59,19 @@ fun showColorPickerDialog(
                 SpacerHeightLarge()
 
                 AppColorPlatterPicker(
-                    initialColor = initialColor,
+                    initialColor = currentColor,
                     onColorSelected = { color ->
-                        onColorSelected(color)
+                        currentColor = color // ✅ always updated
                     }
                 )
 
                 SpacerHeightLarge()
 
                 Button(
-                    onClick = onDismiss,
+                    onClick = {
+                        onColorSelected(currentColor)
+                        onDismiss()
+                    },
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(btnLabel)
