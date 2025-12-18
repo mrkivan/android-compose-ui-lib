@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -18,6 +19,8 @@ fun AppInnerScaffold(
     toolbarConfig: AppToolbarConfig,
     isDarkMode: Boolean,
     modifier: Modifier = Modifier,
+    floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
     bodyContent: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -27,6 +30,8 @@ fun AppInnerScaffold(
                 isDarkMode = isDarkMode
             )
         },
+        floatingActionButton = floatingActionButton,
+        floatingActionButtonPosition = floatingActionButtonPosition,
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         Box(

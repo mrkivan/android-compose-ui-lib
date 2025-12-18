@@ -74,7 +74,12 @@ fun NumberInputTexField(
     }
 
     LaunchedEffect(isFocused) {
-        if (!isFocused) {
+        if (isFocused) {
+            // Select all text on focus to allow overwriting the entire value when typing starts
+            textFieldValue = textFieldValue.copy(
+                selection = TextRange(0, textFieldValue.text.length)
+            )
+        } else {
             val raw = textFieldValue.text.replace(",", "")
             val valueToFormat =
                 if (raw.isEmpty() && config.isRequired) BigDecimal.ZERO else raw.toBigDecimalOrNull()

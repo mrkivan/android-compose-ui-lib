@@ -37,8 +37,7 @@ fun SpinnerWidgetContentWithIcon(
     description: String? = null,
 ) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .clip(MaterialTheme.shapes.medium)
             .clickable(
                 onClick = onClick,
