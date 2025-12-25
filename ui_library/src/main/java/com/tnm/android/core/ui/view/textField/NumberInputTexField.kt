@@ -119,6 +119,7 @@ fun NumberInputTexField(
 
                 if (raw.isEmpty()) {
                     textFieldValue = TextFieldValue("", selection = TextRange(0))
+                    config.onValueChange(BigDecimal.ZERO)
                     return@TextField
                 }
 
