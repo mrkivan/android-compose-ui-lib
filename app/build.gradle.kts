@@ -19,8 +19,8 @@ android {
         applicationId = "com.tnm.android.core"
         minSdk = 26
         targetSdk = 36
-        versionCode = 40
-        versionName = "2.3.8"
+        versionCode = 41
+        versionName = "2.4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

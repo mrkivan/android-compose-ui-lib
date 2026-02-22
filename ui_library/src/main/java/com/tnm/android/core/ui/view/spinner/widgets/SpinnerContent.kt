@@ -14,75 +14,87 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tnm.android.core.ui.R
 import com.tnm.android.core.ui.view.AppSearchBar
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 
+@OptIn(FlowPreview::class)
 @Composable
 fun <T> SpinnerContent(
     config: SmartSpinnerConfig<T>,
     dataItems: List<T>,
     selectedItems: Set<T>,
-    itemContent: (@Composable (item: T, selected: Boolean) -> Unit)?,
     onDismiss: (Set<T>) -> Unit,
     modifier: Modifier = Modifier,
+    itemContent: (@Composable (item: T, selected: Boolean) -> Unit)? = null,
     onSelectionChanged: (Set<T>) -> Unit = {},
 ) {
+    // Local state
     var search by remember { mutableStateOf("") }
-    var filterItems by remember { mutableStateOf(dataItems) }
-
-    fun toggleSelection(item: T) {
-        val current = selectedItems.toMutableSet()
-
-        if (!config.multiSelectEnable) {
-            current.clear()
-            current.add(item)
-            onSelectionChanged(current)
-            onDismiss.invoke(current)
-        } else {
-            if (current.contains(item)) current.remove(item)
-            else current.add(item)
-            onSelectionChanged(current)
+    val searchFlow = remember { MutableStateFlow("") }
+    val filteredItems by produceState(initialValue = dataItems, searchFlow, dataItems) {
+        searchFlow.debounce(200).collectLatest { query ->
+            value = if (query.isBlank()) dataItems
+            else dataItems.filter { config.rowLabel(it).contains(query, ignoreCase = true) }
         }
     }
 
-    LaunchedEffect(search, dataItems) {
-        filterItems =
-            if (search.isBlank()) dataItems
-            else dataItems.filter {
-                config.rowLabel(it).lowercase().startsWith(search.lowercase())
-            }
+    // Hold latest selectedItems to avoid stale closures
+    val currentSelected by rememberUpdatedState(selectedItems)
+
+    fun toggleSelection(item: T) {
+        val updated = currentSelected.toMutableSet()
+        if (!config.multiSelectEnable) {
+            updated.clear()
+            updated.add(item)
+            onSelectionChanged(updated)
+            onDismiss(updated)
+        } else {
+            if (updated.contains(item)) updated.remove(item)
+            else updated.add(item)
+            onSelectionChanged(updated)
+        }
     }
 
     Column(modifier = modifier.padding(vertical = 4.dp)) {
         if (config.searchable) {
             SpinnerSearchBarSection(
                 search = search,
-                onSearchChange = { search = it },
+                onSearchChange = {
+                    search = it
+                    searchFlow.value = it
+                },
                 placeholder = config.searchPlaceHolder.orEmpty()
             )
         }
+
         SpinnerListSection(
-            items = filterItems,
-            selectedItems = selectedItems,
+            items = filteredItems,
+            selectedItems = currentSelected,
             config = config,
-            onToggle = { toggleSelection(it) },
+            onToggle = ::toggleSelection,
             itemContent = itemContent
         )
     }
@@ -97,15 +109,15 @@ private fun SpinnerSearchBarSection(
     AppSearchBar(
         search = search,
         onSearchChange = onSearchChange,
-        placeHolder = placeholder,
+        placeHolder = placeholder.ifBlank { "Search..." },
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     )
 
     HorizontalDivider(
-        thickness = 1.dp,
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+        thickness = 1.dp
     )
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -117,7 +129,7 @@ private fun <T> SpinnerListSection(
     selectedItems: Set<T>,
     config: SmartSpinnerConfig<T>,
     onToggle: (T) -> Unit,
-    itemContent: (@Composable (item: T, selected: Boolean) -> Unit)?,
+    itemContent: (@Composable (item: T, selected: Boolean) -> Unit)? = null,
 ) {
     if (items.isEmpty()) {
         Box(
@@ -146,7 +158,7 @@ private fun <T> SpinnerListSection(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(items) { item ->
+            items(items, key = { it.hashCode() }) { item ->
                 SpinnerItemView(
                     item = item,
                     isSelected = selectedItems.contains(item),
@@ -161,14 +173,15 @@ private fun <T> SpinnerListSection(
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(items) { item ->
+            itemsIndexed(items, key = { _, item -> item.hashCode() }) { index, item ->
                 SpinnerItemView(
                     item = item,
                     isSelected = selectedItems.contains(item),
                     isGrid = false,
                     config = config,
                     onToggle = onToggle,
-                    itemContent = itemContent
+                    itemContent = itemContent,
+                    showDivider = index != items.lastIndex // remove divider for last
                 )
             }
         }
@@ -182,61 +195,61 @@ private fun <T> SpinnerItemView(
     isGrid: Boolean,
     config: SmartSpinnerConfig<T>,
     onToggle: (T) -> Unit,
-    itemContent: (@Composable (item: T, selected: Boolean) -> Unit)?,
+    itemContent: (@Composable (item: T, selected: Boolean) -> Unit)? = null,
+    showDivider: Boolean = true
 ) {
     if (isGrid) {
-        // GRID ITEM
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onToggle(item) },
+                .clickable { onToggle(item) }
+                .semantics {
+                    selected = isSelected
+                },
             shape = MaterialTheme.shapes.medium,
             tonalElevation = 4.dp,
             color = if (isSelected)
-                Color(0xFF4A4458).copy(alpha = 0.40f)
-            else
-                MaterialTheme.colorScheme.surface
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+            else MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier.padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (itemContent != null) {
-                    itemContent(item, isSelected)
-                } else {
-                    SpinnerDefaultCol(
-                        label = config.rowLabel(item),
-                        isSelected = isSelected,
-                        isMultiSelectEnable = config.multiSelectEnable
-                    )
-                }
+                if (itemContent != null) itemContent(item, isSelected)
+                else SpinnerDefaultCol(
+                    label = config.rowLabel(item),
+                    isSelected = isSelected,
+                    isMultiSelectEnable = config.multiSelectEnable
+                )
             }
         }
     } else {
-        // 📄 LIST ITEM
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onToggle(item) }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .semantics {
+                        selected = isSelected
+                    },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (itemContent != null) {
-                    itemContent(item, isSelected)
-                } else {
-                    SpinnerDefaultRow(
-                        label = config.rowLabel(item),
-                        isSelected = isSelected,
-                        isMultiSelectEnable = config.multiSelectEnable
-                    )
-                }
+                if (itemContent != null) itemContent(item, isSelected)
+                else SpinnerDefaultRow(
+                    label = config.rowLabel(item),
+                    isSelected = isSelected,
+                    isMultiSelectEnable = config.multiSelectEnable
+                )
             }
 
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                thickness = 1.dp
-            )
+            if (showDivider) {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                    thickness = 1.dp
+                )
+            }
         }
     }
 }

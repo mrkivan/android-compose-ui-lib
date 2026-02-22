@@ -29,7 +29,7 @@ fun showColorPickerDialog(
     btnLabel: String,
     modifier: Modifier = Modifier
 ) {
-    // 🔑 Hold selected color INSIDE dialog
+    // Hold selected color INSIDE dialog
     var currentColor by remember {
         mutableStateOf(initialColor ?: Color.Red)
     }
@@ -61,7 +61,7 @@ fun showColorPickerDialog(
                 AppColorPlatterPicker(
                     initialColor = currentColor,
                     onColorSelected = { color ->
-                        currentColor = color // ✅ always updated
+                        currentColor = color // always updated
                     }
                 )
 

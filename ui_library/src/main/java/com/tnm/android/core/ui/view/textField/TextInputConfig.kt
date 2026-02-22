@@ -16,7 +16,7 @@ data class TextInputConfig(
     val imeAction: ImeAction = ImeAction.Default,
     val capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
     val visualTransformation: VisualTransformation = VisualTransformation.None,
-    val designFlat: Boolean = false // ✅ New flag
+    val designFlat: Boolean = false // New flag
 ) {
     fun resolvedMaxLines(): Int = if (singleLine) 1 else maxLines
 }

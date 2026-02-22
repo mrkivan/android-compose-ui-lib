@@ -37,7 +37,7 @@ fun AppColorPlatterPicker(
         mutableStateOf(initialColor ?: Color.hsv(0f, 1f, 1f))
     }
 
-    // 🔥 Initialize HSV from initialColor ONCE
+    // Initialize HSV from initialColor ONCE
     LaunchedEffect(initialColor) {
         initialColor?.let { color ->
             val hsv = FloatArray(3)
@@ -51,7 +51,7 @@ fun AppColorPlatterPicker(
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
-        // 🎨 Color palette
+        // Color palette
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
@@ -65,7 +65,7 @@ fun AppColorPlatterPicker(
                         value = v
 
                         selectedColor = Color.hsv(hue, saturation, value)
-                        onColorSelected(selectedColor) // ✅ always called
+                        onColorSelected(selectedColor) // always called
                     }
                 }
         ) {
@@ -89,21 +89,21 @@ fun AppColorPlatterPicker(
 
         SpacerHeightLarge()
 
-        // 🎚 Hue slider
+        // Hue slider
         Text(text = "Hue: ${hue.roundToInt()}")
         Slider(
             value = hue,
             onValueChange = {
                 hue = it
                 selectedColor = Color.hsv(hue, saturation, value)
-                onColorSelected(selectedColor) // ✅ always called
+                onColorSelected(selectedColor) // always called
             },
             valueRange = 0f..360f
         )
 
         SpacerHeightLarge()
 
-        // 🟦 Preview
+        // Preview
         Surface(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier

@@ -230,7 +230,7 @@ fun WidgetShowcaseScreen(
                         designFlat = false,
                         onResult = { selectedHobbies = it },
                         rowLabel = { it },
-                        isGrid = Pair(true, 3)
+                        //isGrid = Pair(true, 3)
                     ),
                     dataItems = listOf(
                         "Travel", "Coding", "Music", "Movies", "Cooking", "Photography",
