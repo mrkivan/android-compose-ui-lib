@@ -1,6 +1,8 @@
+import com.android.build.api.dsl.ApplicationExtension
+import org.gradle.kotlin.dsl.configure
+
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
@@ -9,11 +11,13 @@ plugins {
     alias(libs.plugins.room)
 }
 
-android {
+// 1. Android Specific Configuration
+extensions.configure<ApplicationExtension> {
     namespace = "com.tnm.android.core"
-    compileSdk {
-        version = release(36)
-    }
+
+    // Simplified to avoid the "compile target not found" error
+    compileSdk = 36
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         applicationId = "com.tnm.android.core"
@@ -34,25 +38,25 @@ android {
             )
         }
     }
+    buildFeatures {
+        resValues = true
+        compose = true
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlin {
-        jvmToolchain(17)
-    }
-    buildFeatures {
-        compose = true
-        buildConfig = true
-    }
-    buildToolsVersion = "36.0.0"
-    hilt {
-        enableAggregatingTask = false
-    }
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
+}
 
+kotlin {
+    jvmToolchain(17)
+}
+hilt {
+    enableAggregatingTask = false
+}
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {

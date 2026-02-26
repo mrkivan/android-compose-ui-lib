@@ -1,20 +1,21 @@
+import com.android.build.api.dsl.LibraryExtension
+
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     id("maven-publish")
 }
 
-@Suppress("UnstableApiUsage")
-android {
+extensions.configure<LibraryExtension> {
     namespace = "com.tnm.android.core.ui"
+
     compileSdk = 36
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         minSdk = 26
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -29,23 +30,15 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        jvmToolchain(17)
-    }
-
     buildFeatures {
+        resValues = true
         compose = true
         buildConfig = true
     }
-    buildToolsVersion = "36.0.0"
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     packaging {
@@ -61,6 +54,10 @@ android {
             withJavadocJar()
         }
     }
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 dependencies {

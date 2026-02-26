@@ -29,7 +29,7 @@ import java.math.RoundingMode
 fun BalanceUsageProgressBar(
     balance: BigDecimal,
     maxLimit: BigDecimal,
-    modifier: Modifier = Modifier.fillMaxWidth()
+    modifier: Modifier = Modifier
 ) {
     var showCreditUsed by remember { mutableStateOf(false) }
     val safeCreditLimit = maxLimit.coerceAtLeast(BigDecimal.ONE)

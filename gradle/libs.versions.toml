@@ -1,7 +1,7 @@
 [versions]
 agp = "9.0.1"
 coreTesting = "2.2.0"
-foundation = "1.10.3"
+foundation = "1.10.4"
 kotlin = "2.3.10"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -14,7 +14,7 @@ activityCompose = "1.12.4"
 composeBom = "2026.02.00"
 room = "2.8.4"
 # Hilt versions
-hilt = "2.59.1"
+hilt = "2.59.2"
 androidxHiltCompiler = "1.3.0"
 
 # KSP version
@@ -23,8 +23,8 @@ appcompat = "1.7.1"
 material = "1.13.0"
 activity = "1.12.4"
 navigationRuntimeKtx = "2.9.7"
-uiUnit = "1.10.3"
-uiGraphics = "1.10.3"
+uiUnit = "1.10.4"
+uiGraphics = "1.10.4"
 
 [libraries]
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
