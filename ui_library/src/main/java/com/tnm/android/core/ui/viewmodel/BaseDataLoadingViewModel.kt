@@ -17,15 +17,15 @@ abstract class BaseDataLoadingViewModel<T> : ViewModel() {
     val state: StateFlow<AppUiState<T>> = _state.asStateFlow()
     protected abstract fun dataFlow(param: Any?): Flow<T>
 
-    protected fun setLoading() {
+    protected open fun setLoading() {
         _state.value = AppUiState.Loading
     }
 
-    protected fun setSuccess(data: T) {
+    protected open fun setSuccess(data: T) {
         _state.value = AppUiState.Success(data)
     }
 
-    protected fun setError(message: String) {
+    protected open fun setError(message: String) {
         _state.value = AppUiState.Error(message)
     }
 
@@ -45,5 +45,4 @@ abstract class BaseDataLoadingViewModel<T> : ViewModel() {
                 }
         }
     }
-
 }
