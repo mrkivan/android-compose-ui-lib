@@ -11,8 +11,7 @@ plugins {
 extensions.configure<LibraryExtension> {
     namespace = "com.tnm.android.core.ui"
 
-    compileSdk = 36
-    buildToolsVersion = "36.0.0"
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
@@ -87,9 +86,9 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
     // ---------- Android Instrumented Test ----------
+    add("androidTestImplementation", platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 }
 

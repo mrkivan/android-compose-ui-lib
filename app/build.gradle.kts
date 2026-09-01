@@ -15,14 +15,13 @@ plugins {
 extensions.configure<ApplicationExtension> {
     namespace = "com.tnm.android.core"
 
-    // Simplified to avoid the "compile target not found" error
-    compileSdk = 36
-    buildToolsVersion = "36.0.0"
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.tnm.android.core"
         minSdk = 26
-        targetSdk = 36
+        //noinspection TargetSdkNeedsUpdate
+        targetSdk = 37
         versionCode = 42
         versionName = "2.4.1"
 
@@ -43,6 +42,9 @@ extensions.configure<ApplicationExtension> {
         resValues = true
         compose = true
         buildConfig = true
+    }
+    lint {
+        disable += setOf("TargetSdkNeedsUpdate", "ExpiredTargetSdkVersion")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -98,9 +100,9 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
     // ---------- Android Instrumented Test ----------
+    add("androidTestImplementation", platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
     implementation(project(":ui_library"))
