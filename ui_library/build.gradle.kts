@@ -98,7 +98,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = "com.tnm.android.core"
                 artifactId = "ui-library"
-                version = "2.4.1"
+                version = "2.4.2"
                 from(components["release"])
             }
         }
@@ -109,7 +109,11 @@ afterEvaluate {
                 url = uri("https://maven.pkg.github.com/mrkivan/android-compose-ui-lib")
                 credentials {
                     username = System.getenv("GITHUB_ACTOR")
+                        ?: (project.findProperty("gpr.user") as? String)
+                        ?: ""
                     password = System.getenv("GITHUB_TOKEN")
+                        ?: (project.findProperty("gpr.key") as? String)
+                        ?: ""
                 }
             }
         }
