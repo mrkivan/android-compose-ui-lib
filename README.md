@@ -33,7 +33,7 @@ maven {
 }
 //build.gradle.kts 
 dependencies {
-    implementation("com.tnm.android.core:ui-library:1.0.2")
+    implementation("com.tnm.android.core:ui-library:2.4.2")
 }
 ```
 ```bash

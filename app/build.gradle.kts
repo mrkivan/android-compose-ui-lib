@@ -22,8 +22,8 @@ extensions.configure<ApplicationExtension> {
         minSdk = 26
         //noinspection TargetSdkNeedsUpdate
         targetSdk = 37
-        versionCode = 42
-        versionName = "2.4.1"
+        versionCode = 43
+        versionName = "2.4.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
