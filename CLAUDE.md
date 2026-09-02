@@ -59,7 +59,7 @@ CI (`.github/workflows/ci.yml`) runs `spotlessCheck`, unit tests, assembly and l
 
 Publishing goes to GitHub Packages, not Maven Central (the README badge is misleading).
 
-CI (`.github/workflows/publish.yml`) runs `spotlessCheck` + unit tests and then `:ui_library:publishReleasePublicationToGitHubRepository` on any `v*` tag push, using `GH_PACKAGES_TOKEN`. Nothing checks that the tag matches the version in `ui_library/build.gradle.kts` — do that by hand.
+CI (`.github/workflows/publish.yml`) runs `spotlessCheck` + unit tests and then `:ui_library:publishReleasePublicationToGitHubRepository` on any `v*` tag push, authenticating with the job's own `GITHUB_TOKEN` (`permissions: packages: write`). No PAT secret is needed or configured. Nothing checks that the tag matches the version in `ui_library/build.gradle.kts` — do that by hand.
 
 Local publish needs `gpr.user` / `gpr.key` in `~/.gradle/gradle.properties` (or `GITHUB_ACTOR` / `GITHUB_TOKEN` env):
 

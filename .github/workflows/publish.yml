@@ -5,6 +5,12 @@ on:
     tags:
       - 'v*'  # Trigger only on tags like v1.0.0
 
+# The job token is enough to publish to this repository's own package namespace; no PAT
+# secret to rotate. The v2.4.2 runs failed with 401 because GH_PACKAGES_TOKEN was never set.
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -29,5 +35,5 @@ jobs:
       - name: Publish library to GitHub Packages
         run: ./gradlew :ui_library:publishReleasePublicationToGitHubRepository
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
