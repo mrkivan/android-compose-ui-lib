@@ -22,8 +22,8 @@ extensions.configure<ApplicationExtension> {
         minSdk = 26
         //noinspection TargetSdkNeedsUpdate
         targetSdk = 37
-        versionCode = 43
-        versionName = "2.4.2"
+        versionCode = 44
+        versionName = "3.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,7 +34,7 @@ extensions.configure<ApplicationExtension> {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -43,8 +43,15 @@ extensions.configure<ApplicationExtension> {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            // Model classes are @Parcelize; without this the android.jar stubs throw.
+            isReturnDefaultValues = true
+        }
+    }
+
     lint {
-        disable += setOf("TargetSdkNeedsUpdate", "ExpiredTargetSdkVersion")
+        disable += setOf("ExpiredTargetSdkVersion")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -66,6 +73,7 @@ dependencies {
     // ---------- Implementation Dependencies ----------
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
 
     // Compose UI
@@ -75,7 +83,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.compose.material.icons.extended)
-    implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)

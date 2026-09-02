@@ -14,7 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,21 +26,21 @@ fun <T> GenericTabView(
     tabs: List<String>,
     modifier: Modifier = Modifier,
     tabKey: Any,
-
-    pageContent: @Composable (selectedTabIndex: Int, data: T) -> Unit
+    pageContent: @Composable (selectedTabIndex: Int, data: T) -> Unit,
 ) {
-    var selectedTabIndex by remember(tabKey) { mutableIntStateOf(0) }
+    // Saveable so the selected tab survives rotation; resets when tabKey changes.
+    var selectedTabIndex by rememberSaveable(tabKey) { mutableIntStateOf(0) }
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         SecondaryTabRow(
             selectedTabIndex = selectedTabIndex,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.surface),
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
@@ -54,7 +54,7 @@ fun <T> GenericTabView(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             pageContent(selectedTabIndex, mainData)
         }
@@ -63,12 +63,8 @@ fun <T> GenericTabView(
 
 @Preview
 @Composable
-fun GenericTabViewPreview() {
-    data class SofData(
-        val id: String,
-        val position: Int,
-        val name: String
-    )
+private fun GenericTabViewPreview() {
+    data class SofData(val id: String, val position: Int, val name: String)
 
     val card = SofData("123", 1, "John Doe")
     val tabs = listOf("Account Info", "Unbilled", "Billed")
@@ -78,13 +74,13 @@ fun GenericTabViewPreview() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 GenericTabView(
                     mainData = card,
                     tabs = tabs,
                     tabKey = card.id, // Use the unique ID for the key
-                    modifier = Modifier
+                    modifier = Modifier,
                 ) { selectedTabIndex, currentCard ->
 
                     when (selectedTabIndex) {

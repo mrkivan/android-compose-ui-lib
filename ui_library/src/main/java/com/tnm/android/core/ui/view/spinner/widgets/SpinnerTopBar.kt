@@ -27,36 +27,30 @@ import androidx.compose.ui.unit.dp
 import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 
 @Composable
-fun <T> SpinnerTopBar(
-    config: SmartSpinnerConfig<T>,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun <T> SpinnerTopBar(config: SmartSpinnerConfig<T>, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(
-                    topStart = 28.dp,   // SAME AS DIALOG/BOTTOMSHEET SHAPE
-                    topEnd = 28.dp
-                )
+                    topStart = 28.dp, // SAME AS DIALOG/BOTTOMSHEET SHAPE
+                    topEnd = 28.dp,
+                ),
             )
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface),
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-
             Text(
                 text = config.widgetTitle,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
 
             if (config.multiSelectEnable) {
@@ -67,16 +61,16 @@ fun <T> SpinnerTopBar(
                     tonalElevation = 3.dp,
                     modifier = Modifier
                         .size(36.dp)
-                        .clickable(onClick = onDismiss)
+                        .clickable(onClick = onDismiss),
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 }
@@ -85,7 +79,7 @@ fun <T> SpinnerTopBar(
 
         HorizontalDivider(
             thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
         )
     }
 }

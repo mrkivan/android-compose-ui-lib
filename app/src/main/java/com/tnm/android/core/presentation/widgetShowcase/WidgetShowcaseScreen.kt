@@ -2,6 +2,7 @@ package com.tnm.android.core.presentation.widgetShowcase
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,8 +17,6 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.tnm.android.core.AppTodoTaskDestinations
 import com.tnm.android.core.NavKeys
@@ -33,6 +36,7 @@ import com.tnm.android.core.presentation.spinnerScreen.TestSpinnerData
 import com.tnm.android.core.ui.view.AppToolbarConfig
 import com.tnm.android.core.ui.view.ToolbarAction
 import com.tnm.android.core.ui.view.card.BaseCardView
+import com.tnm.android.core.ui.view.dialog.ConfirmDialog
 import com.tnm.android.core.ui.view.dialog.showAppDatePicker
 import com.tnm.android.core.ui.view.dialog.showAppTimePicker
 import com.tnm.android.core.ui.view.scaffold.PlaceholderScaffoldWithoutState
@@ -42,41 +46,22 @@ import com.tnm.android.core.ui.view.spinner.config.SmartSpinnerConfig
 import com.tnm.android.core.ui.view.spinner.config.SpinnerDisplayType
 import com.tnm.android.core.ui.view.spinner.config.SpinnerNavKeys
 import com.tnm.android.core.ui.view.textField.NumberInputConfig
-import com.tnm.android.core.ui.view.textField.NumberInputTexField
+import com.tnm.android.core.ui.view.textField.NumberInputTextField
 import com.tnm.android.core.ui.view.textField.TextInputConfig
 import com.tnm.android.core.ui.view.textField.TextInputField
 import com.tnm.android.core.ui.view.textView.TvSelectableText
 import com.tnm.android.core.ui.view.textView.TvTitleCustomBold
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun WidgetShowcaseScreen(
-    navController: NavHostController,
-    viewModel: WidgetShowcaseViewModel,
-    screenData: WidgetShowcaseState?,
-) {
+fun WidgetShowcaseScreen(navController: NavHostController, viewModel: WidgetShowcaseViewModel) {
     val context = LocalContext.current
 
     var selectedCountry by remember { mutableStateOf<Set<String>>(emptySet()) }
     var selectedHobbies by remember { mutableStateOf<Set<String>>(emptySet()) }
-    val spinnerPlaceHolder1 by remember(selectedCountry) {
-        derivedStateOf {
-            if (selectedCountry.isEmpty())
-                "Select Country"
-            else selectedCountry.joinToString(", ") { it }
-        }
-    }
-    val spinnerPlaceHolder2 by remember(selectedHobbies) {
-        derivedStateOf {
-            if (selectedHobbies.isEmpty())
-                "Select Hobbies"
-            else selectedHobbies.joinToString(", ") { it }
-        }
-    }
     // ---------------------------
     // FIXED: Proper Safe Collection of SavedStateHandle Set
     // ---------------------------
@@ -85,28 +70,21 @@ fun WidgetShowcaseScreen(
             ?.savedStateHandle
             ?.getStateFlow<ArrayList<TestSpinnerData>>(
                 SpinnerNavKeys.DATA_KEY_SELECTED_ITEMS,
-                arrayListOf()
+                arrayListOf(),
             )
 
-    val selectedAnimals by (selectedAnimalsStateFlow
-        ?.map { it.toSet() }
-        ?.collectAsState(initial = emptySet())
-        ?: remember { mutableStateOf(emptySet()) })
+    val selectedAnimals by (
+        selectedAnimalsStateFlow
+            ?.map { it.toSet() }
+            ?.collectAsStateWithLifecycle(initialValue = emptySet())
+            ?: remember { mutableStateOf(emptySet()) }
+        )
 
-    // ---------------------------
-    // FIXED LABEL: Only recomposes when selectedAnimals changes
-    // ---------------------------
-    val fullScreenSpinnerPlaceHolder by remember(selectedAnimals) {
-        derivedStateOf {
-            if (selectedAnimals.isEmpty())
-                "Select Animals on Full Screen"
-            else selectedAnimals.joinToString(", ") { it.title }
-        }
-    }
-
+    // widgetPlaceholder is only shown while nothing is selected; SmartSpinner renders the
+    // selection itself, so there is nothing to derive here.
     val spinnerConfig = SmartSpinnerConfig<TestSpinnerData>(
-        widgetTitle = "Select Animals on Full Screen",
-        widgetPlaceholder = fullScreenSpinnerPlaceHolder,
+        widgetTitle = "Animals",
+        widgetPlaceholder = "Select Animals on Full Screen",
         spinnerType = SpinnerDisplayType.FullScreen,
         multiSelectEnable = true,
     )
@@ -117,49 +95,57 @@ fun WidgetShowcaseScreen(
         animals.mapIndexed { index, name ->
             TestSpinnerData(
                 id = index + 1,
-                title = name
+                title = name,
             )
         }
 
     // ---------------------------
-    // VIEWMODEL LISTENERS (UNCHANGED)
+    // VIEWMODEL EVENTS
     // ---------------------------
+    var showLeaveWarning by remember { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val activity = LocalActivity.current
+
     LaunchedEffect(Unit) {
-
-        viewModel.handleIntent(WidgetShowcaseIntent.LoadData(screenData))
-        launch {
-            viewModel.navigationEvents.collect { event ->
+        // repeatOnLifecycle: without it, navigation and toasts fire while the screen is in the
+        // background and land on whatever is on top by the time the user returns.
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collect { event ->
                 when (event) {
-                    is WidgetShowcaseNavEvent.NavToTaskListScreen -> {
+                    is WidgetShowcaseEvent.NavigateToTaskList ->
                         navController.navigate(AppTodoTaskDestinations.ROUTE_ADD_TODO_TASK)
-                    }
-                }
-            }
-        }
-        launch {
-            viewModel.notificationMessage.collect { message ->
-                if (!message.isNullOrEmpty()) {
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
 
-        launch {
-            viewModel.navigateToHome.collect {
-                navController.navigateUp()
-            }
-        }
+                    // This screen is the start destination: navigateUp() returns false there
+                    // (nothing to pop, no parent activity) and used to leave the user unable to
+                    // exit the app with Back. Finish the activity in that case.
+                    is WidgetShowcaseEvent.NavigateBack ->
+                        if (!navController.navigateUp()) activity?.finish()
 
-        launch {
-            viewModel.showWarningDialog.collect {
-                // TODO
+                    is WidgetShowcaseEvent.ShowLeaveWarning -> showLeaveWarning = true
+
+                    is WidgetShowcaseEvent.ShowMessage ->
+                        Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
     BackHandler {
-        viewModel.handleIntent(WidgetShowcaseIntent.ShowWarningPopup)
+        viewModel.handleIntent(WidgetShowcaseIntent.BackPressed)
     }
+
+    ConfirmDialog(
+        title = "Leave this screen?",
+        message = "Any unsaved changes on this screen will be lost.",
+        confirmButtonLabel = "Leave",
+        visible = showLeaveWarning,
+        onConfirm = {
+            showLeaveWarning = false
+            viewModel.handleIntent(WidgetShowcaseIntent.ConfirmLeave)
+        },
+        onDismiss = { showLeaveWarning = false },
+    )
 
     // ---------------------------
     // UI
@@ -170,12 +156,12 @@ fun WidgetShowcaseScreen(
             actions = listOf(
                 ToolbarAction(
                     icon = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = null,
+                    contentDescription = "Open task list",
                     onClick = {
                         viewModel.handleIntent(WidgetShowcaseIntent.NavigateToTaskList)
-                    }
+                    },
                 ),
-            )
+            ),
         ),
         isDarkMode = isSystemInDarkTheme(),
     ) { _ ->
@@ -184,25 +170,23 @@ fun WidgetShowcaseScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-
             // ---------------------------
             // COUNTRY SPINNER
             // ---------------------------
             item {
-
                 SmartSpinner(
                     config = SmartSpinnerConfig(
-                        widgetTitle = "Select Country",
-                        widgetPlaceholder = spinnerPlaceHolder1,
+                        widgetTitle = "Country",
+                        widgetPlaceholder = "Select Country",
                         spinnerType = SpinnerDisplayType.Dialog,
                         searchable = true,
                         searchPlaceHolder = "Search by country",
                         onResult = { selectedCountry = it },
                         rowLabel = { it },
                         designFlat = true,
-                        isGrid = Pair(true, 3)
+                        gridColumns = 3,
                     ),
                     dataItems = listOf(
                         "Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh",
@@ -210,9 +194,9 @@ fun WidgetShowcaseScreen(
                         "Georgia", "India", "Indonesia", "Iran", "Iraq",
                         "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait",
                         "Kyrgyzstan", "Laos", "Lebanon", "Malaysia", "Maldives",
-                        "Mongolia", "Myanmar", "Nepal", "North Korea", "Oman"
+                        "Mongolia", "Myanmar", "Nepal", "North Korea", "Oman",
                     ),
-                    selectedItems = selectedCountry
+                    selectedItems = selectedCountry,
                 )
             }
 
@@ -220,22 +204,25 @@ fun WidgetShowcaseScreen(
             // HOBBIES SPINNER
             // ---------------------------
             item {
-
                 SmartSpinner(
                     config = SmartSpinnerConfig(
-                        widgetTitle = "Select Hobbies",
-                        widgetPlaceholder = spinnerPlaceHolder2,
+                        widgetTitle = "Hobbies",
+                        widgetPlaceholder = "Select Hobbies",
                         spinnerType = SpinnerDisplayType.Dialog,
                         multiSelectEnable = false,
                         designFlat = false,
                         onResult = { selectedHobbies = it },
                         rowLabel = { it },
-                        //isGrid = Pair(true, 3)
                     ),
                     dataItems = listOf(
-                        "Travel", "Coding", "Music", "Movies", "Cooking", "Photography",
+                        "Travel",
+                        "Coding",
+                        "Music",
+                        "Movies",
+                        "Cooking",
+                        "Photography",
                     ),
-                    selectedItems = selectedHobbies
+                    selectedItems = selectedHobbies,
                 )
             }
 
@@ -248,33 +235,32 @@ fun WidgetShowcaseScreen(
                     dataItems = animalDataList,
                     selectedItems = selectedAnimals,
                     navigateToFullScreen = {
-
                         // FIXED: savedStateHandle always stores ArrayList
                         navController.currentBackStackEntry
                             ?.savedStateHandle
                             ?.set(
                                 SpinnerNavKeys.DATA_KEY_SPINNER_ITEMS,
-                                ArrayList(animalDataList)
+                                ArrayList(animalDataList),
                             )
 
                         navController.currentBackStackEntry
                             ?.savedStateHandle
                             ?.set(
                                 SpinnerNavKeys.DATA_KEY_SELECTED_ITEMS,
-                                ArrayList(selectedAnimals)
+                                ArrayList(selectedAnimals),
                             )
 
                         navController.currentBackStackEntry
                             ?.savedStateHandle
                             ?.set(
                                 NavKeys.DATA_KEY_SPINNER_CONFIG,
-                                spinnerConfig
+                                spinnerConfig,
                             )
 
                         navController.navigate(
-                            AppTodoTaskDestinations.ROUTE_TEST_SPINNER_SCREEN
+                            AppTodoTaskDestinations.ROUTE_TEST_SPINNER_SCREEN,
                         )
-                    }
+                    },
                 )
             }
 
@@ -285,23 +271,23 @@ fun WidgetShowcaseScreen(
                 TvTitleCustomBold(text = "Select Date")
             }
             item {
-                NumberInputTexField(
+                NumberInputTextField(
                     config = NumberInputConfig(
                         withoutDecimal = false,
                         isRequired = true,
-                    )
+                    ),
                 )
             }
             item {
-                NumberInputTexField(
+                NumberInputTextField(
                     initValue = BigDecimal("1000.00"),
-                    config = NumberInputConfig()
+                    config = NumberInputConfig(),
                 )
             }
             item {
-                NumberInputTexField(
+                NumberInputTextField(
                     initValue = BigDecimal("999.00"),
-                    config = NumberInputConfig(designFlat = true)
+                    config = NumberInputConfig(designFlat = true),
                 )
             }
             item {
@@ -309,7 +295,6 @@ fun WidgetShowcaseScreen(
                     modifier = Modifier.padding(16.dp),
                     value = "Sample test input with false",
                     config = TextInputConfig(),
-                    isDarkMode = isSystemInDarkTheme(),
                 )
             }
             item {
@@ -317,13 +302,13 @@ fun WidgetShowcaseScreen(
                     modifier = Modifier.padding(16.dp),
                     value = "Sample test input with true",
                     config = TextInputConfig(designFlat = true),
-                    isDarkMode = isSystemInDarkTheme(),
                 )
             }
             item {
                 GetDatePicker(
-                    validateDate = { viewModel.validateDate() },
-                    onDateSelected = { date -> }
+                    // Showcases real validation: today or later only.
+                    validateDate = { date -> !date.isBefore(LocalDate.now()) },
+                    onDateSelected = { date -> },
                 )
             }
             item {
@@ -332,7 +317,7 @@ fun WidgetShowcaseScreen(
             item {
                 GetTimePicker(
                     validateTime = { true },
-                    onTimeSelected = { time -> }
+                    onTimeSelected = { time -> },
                 )
             }
         }
@@ -344,7 +329,7 @@ private fun GetDatePicker(
     previousDate: LocalDate? = null,
     enableEdit: Boolean = true,
     validateDate: (LocalDate) -> Boolean,
-    onDateSelected: (LocalDate) -> Unit
+    onDateSelected: (LocalDate) -> Unit,
 ) {
     val context = LocalContext.current
     var selectedDate by remember { mutableStateOf(previousDate?.toString()) }
@@ -358,39 +343,38 @@ private fun GetDatePicker(
                     selectedDate = it.toString()
                     onDateSelected(it)
                 },
-                context = context
+                context = context,
             )
         },
         isEnable = enableEdit,
         bodyContent = {
             Row(
                 modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 TvSelectableText(
                     value = selectedDate,
                     placeholder = "Select Date",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 SpacerWidthLarge()
                 Icon(
                     imageVector = Icons.Default.DateRange,
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
-        }
+        },
     )
 }
-
 
 @Composable
 private fun GetTimePicker(
     previousTime: LocalTime? = null,
     enableEdit: Boolean = true,
     validateTime: (LocalTime) -> Boolean,
-    onTimeSelected: (LocalTime) -> Unit
+    onTimeSelected: (LocalTime) -> Unit,
 ) {
     var selectedTime by remember { mutableStateOf(previousTime?.toString()) }
 
@@ -406,26 +390,26 @@ private fun GetTimePicker(
                     onTimeSelected(time)
                 },
                 selectedTime = previousTime,
-                context = context
+                context = context,
             )
         },
         bodyContent = {
             Row(
                 modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 TvSelectableText(
                     value = selectedTime,
                     placeholder = "Select Time",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
                 SpacerWidthLarge()
                 Icon(
                     imageVector = Icons.Default.Timer,
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
-        }
+        },
     )
 }

@@ -2,17 +2,17 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build](https://github.com/mrkivan/android-compose-ui-lib/actions/workflows/publish.yml/badge.svg)](https://github.com/mrkivan/android-compose-ui-lib/actions/workflows/publish.yml)
-[![Maven](https://img.shields.io/maven-central/v/com.tnm.android.core/ui-library.svg?label=Maven%20Central)](https://maven.pkg.github.com/mrkivan/android-compose-ui-lib)
+[![GitHub Packages](https://img.shields.io/badge/GitHub%20Packages-3.0.0-blue.svg)](https://github.com/mrkivan/android-compose-ui-lib/packages)
 [![Issues](https://img.shields.io/github/issues/mrkivan/android-compose-ui-lib.svg)](https://github.com/mrkivan/android-compose-ui-lib/issues)
 [![GitHub stars](https://img.shields.io/github/stars/mrkivan/android-compose-ui-lib.svg?style=social)](https://github.com/mrkivan/android-compose-ui-lib/stargazers)
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9-blue.svg)](https://kotlinlang.org/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4-blue.svg)](https://kotlinlang.org/)
 
 A lightweight Jetpack Compose library for common UI patterns in Android apps, including MVVM state management, toolbars, cards, scaffolds, dialogs,
 spacers, date/time pickers, and text utilities. Designed for reusability in any Compose-based project.
 
 ## Features
 
-- **MVVM Support**: `BaseViewModel` for easy state handling with Flows.
+- **MVI Support**: `BaseDataLoadingViewModel` + `AppUiState` for state handling with Flows.
 - **Toolbar**: Configurable top app bar with icons and actions.
 - **Scaffold**: Loading/error/retry placeholder scaffold.
 - **Cards & Dialogs**: Clickable cards and confirmation dialogs.
@@ -33,7 +33,7 @@ maven {
 }
 //build.gradle.kts 
 dependencies {
-    implementation("com.tnm.android.core:ui-library:2.4.2")
+    implementation("com.tnm.android.core:ui-library:3.0.0")
 }
 ```
 ```bash
@@ -54,11 +54,10 @@ loading/error states.
 #### Setup
 
 Extend `BaseDataLoadingViewModel<T>` and provide `dataFlow(param: Any?): Flow<T>` (e.g., from a repository). Override `handleIntent` for user actions.
-For example check `DashboardViewModel`
+Override `errorMessage(cause)` to localise what `AppUiState.Error` shows. For a working example see `TaskListViewModel` in the `:app` module.
 
 ```kotlin
 class DashboardViewModel : BaseDataLoadingViewModel<List<TodoTask>>() {
-    override val dataFlow: Flow<List<MyData>> = flowOf(listOf(MyData()))  // Your data source
 
     override fun dataFlow(param: Any?): Flow<List<TodoTask>> {
         val status = param as? TodoTaskStatus
@@ -82,14 +81,16 @@ Collect you can use this `PlaceholderScaffold`, which will handle the `uiState`:
 
 ```kotlin
 @Composable
-fun dashboardScreen(viewModel: DashboardViewModel) {
-    val uiState by viewModel.state.collectAsState()
+fun DashboardScreen(viewModel: DashboardViewModel) {
+    // collectAsStateWithLifecycle stops collecting while the app is backgrounded
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         viewModel.handleIntent(DashboardIntent.LoadAllData)
     }
     PlaceholderScaffold(
-        toolbarConfig = AppToolbarConfig(),// TODO implement this 
-        uiState = uiState.value,
+        toolbarConfig = AppToolbarConfig(title = "Dashboard"),
+        uiState = uiState,
+        isDarkMode = isSystemInDarkTheme(),
         modifier = Modifier,
         onRetryClicked = {
             viewModel.handleIntent(DashboardIntent.LoadAllData)
@@ -113,7 +114,7 @@ AppToolbarConfig(
     actions = listOf(
         ToolbarAction(
             icon = Icons.Default.Add,
-            contentDescription = null,
+            contentDescription = "Add task", // read by TalkBack; only null for purely decorative icons
             onClick = {
                 viewModel.handleIntent(DashboardIntent.NavigateToAddTodoTask)
             }
@@ -128,11 +129,11 @@ A clickable card with optional enable/disable.
 
 ```kotlin
 @Composable
-fun myCard() {
+fun MyCard() {
     BaseCardView(
-        modifier = Modifier.fillMaxWidth(),
         onClick = { /* Handle click */ },
-        isEnable = true
+        isEnable = true,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text("Card Content")
     }
@@ -145,11 +146,11 @@ A scaffold with built-in loading, error, and retry handling for `AppUiState<T>`,
 
 ### 5. ConfirmDialog
 
-A Material3 confirmation dialog controlled by a `MutableState<Boolean>`.
+A Material3 confirmation dialog. State is hoisted: you own the `visible` flag and flip it in the callbacks.
 
 ```kotlin
 @Composable
-fun myScreen() {
+fun MyScreen() {
     var showDialog by remember { mutableStateOf(false) }
     Button(onClick = { showDialog = true }) {
         Text("Show Dialog")
@@ -158,12 +159,17 @@ fun myScreen() {
         title = "Confirm Action",
         message = "Are you sure?",
         confirmButtonLabel = "Yes",
-        onConfirm = { showDialog = false },
-        onCancel = { showDialog = false },
-        showDialogState = remember { mutableStateOf(showDialog) }
+        visible = showDialog,
+        onConfirm = {
+            showDialog = false
+            /* do the thing */
+        },
+        onDismiss = { showDialog = false }, // cancel button, back press, tap outside
     )
 }
 ```
+
+The 2.x overload taking a `MutableState<Boolean>` still compiles but is deprecated.
 
 ### 6. Spacers
 
@@ -171,7 +177,7 @@ Simple horizontal/vertical spacers with predefined sizes.
 
 ```kotlin
 @Composable
-fun myLayout() {
+fun MyLayout() {
     Column {
         Text("Item 1")
         SpacerHeightSmall()  // 4.dp height
@@ -222,7 +228,7 @@ Generic text composables for consistent typography. Use wrappers for common styl
 
 ```kotlin
 @Composable
-fun myTitles() {
+fun MyTitles() {
     TvTitleMediumBold(
         text = "Bold Title",
         modifier = Modifier.padding(8.dp)
@@ -235,10 +241,27 @@ fun myTitles() {
 }
 ```
 
+## Migrating from 2.x
+
+3.0.0 renames a few misspelled symbols and tightens some signatures. Old names remain as deprecated aliases and will be removed in 4.0.
+
+| 2.x | 3.0 |
+|---|---|
+| `NumberInputTexField` | `NumberInputTextField` |
+| `AppExpendableDropdown` | `AppExpandableDropdown` |
+| `DonutChartWithTabs` | `DonutChartCard` |
+| `AppConstants.ASPECT_RATION` | `AppConstants.ASPECT_RATIO` |
+| `SmartSpinnerConfig(isGrid = Pair(true, 3))` | `SmartSpinnerConfig(gridColumns = 3)` |
+| `ConfirmDialog(showDialogState = …)` | `ConfirmDialog(visible = …, onDismiss = …)` |
+| `TextInputField(isDarkMode = …)` | parameter is ignored; colours come from `MaterialTheme` |
+| `formatCurrency(locale)` | unchanged, still rounds to whole units; pass `fractionDigits = 2` to keep cents |
+
+Parameter order changed on `ClickableRowWithIcon`, `ClickableColumnWithIcon` and `TextInputField` (required parameters now precede `modifier`); named arguments are unaffected.
+
 ## Contributing
 
-- Fork the repo and submit PRs.
-- Follow Kotlin/Compose best practices.
+- Fork the repo and submit PRs. CI runs `spotlessCheck`, unit tests, assembly and lint on every PR.
+- Run `./gradlew spotlessApply` before pushing; formatting is enforced by ktlint via Spotless.
 
 ## License
 

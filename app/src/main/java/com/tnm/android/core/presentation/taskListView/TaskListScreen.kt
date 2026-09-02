@@ -22,56 +22,57 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.tnm.android.core.data.TodoTaskStatus
+import com.tnm.android.core.R
 import com.tnm.android.core.domain.TodoTask
+import com.tnm.android.core.domain.TodoTaskStatus
 import com.tnm.android.core.ui.view.AppToolbarConfig
 import com.tnm.android.core.ui.view.card.BaseCardView
 import com.tnm.android.core.ui.view.scaffold.PlaceholderScaffold
 
 @Composable
-fun TaskListScreen(
-    navController: NavHostController,
-    viewModel: TaskListViewModel
-) {
-    val uiState = viewModel.state.collectAsState()
+fun TaskListScreen(navController: NavHostController, viewModel: TaskListViewModel) {
+    // Lifecycle-aware: plain collectAsState() keeps collecting while the app is backgrounded.
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.handleIntent(TaskListIntent.LoadAllData)
-
     }
 
     PlaceholderScaffold(
         toolbarConfig = AppToolbarConfig(
-            title = "Todo Tasks List",
+            title = stringResource(R.string.task_list_title),
             navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
+            navigationIconContentDescription = stringResource(com.tnm.android.core.ui.R.string.navigate_back),
             onNavigationClick = { navController.navigateUp() },
         ),
 
-        uiState = uiState.value,
+        uiState = uiState,
         modifier = Modifier,
         isDarkMode = isSystemInDarkTheme(),
         onRetryClicked = {
             viewModel.handleIntent(TaskListIntent.LoadAllData)
-        }
+        },
     ) { _, data ->
         TaskListDataView(data)
     }
 }
 
 @Composable
-fun TaskListDataView(data: List<TodoTask>) {
+fun TaskListDataView(data: List<TodoTask>, modifier: Modifier = Modifier) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         itemsIndexed(
             items = data,
-            key = { _, item -> item.id }
+            key = { _, item -> item.id },
         ) { index, item ->
 
             val isFirst = index == 0
@@ -84,42 +85,37 @@ fun TaskListDataView(data: List<TodoTask>) {
                         start = 16.dp,
                         end = 16.dp,
                         top = if (isFirst) 16.dp else 8.dp,
-                        bottom = if (isLast) 16.dp else 8.dp
-                    )
+                        bottom = if (isLast) 16.dp else 8.dp,
+                    ),
             ) {
                 BaseCardView(
                     isEnable = true,
-                    onClick = {
-                        // TODO
-                    },
+                    // Showcase only: there is no task detail screen to open.
+                    onClick = {},
                     modifier = Modifier,
                     bodyContent = {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-
                             Column(
                                 modifier = Modifier.weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
                             ) {
                                 Text(
                                     text = item.taskName,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-
-                                    // 🔥 FIX: Dynamic color for dark/light theme
                                     color = MaterialTheme.colorScheme.onSurface,
-
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
                                 )
 
                                 Text(
                                     text = item.taskDescription,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
 
@@ -135,14 +131,11 @@ fun TaskListDataView(data: List<TodoTask>) {
                             Icon(
                                 imageVector = icon,
                                 contentDescription = null,
-
-                                // 🔥 FIX: Use theme color instead of default
                                 tint = MaterialTheme.colorScheme.primary,
-
-                                modifier = Modifier.size(42.dp)
+                                modifier = Modifier.size(42.dp),
                             )
                         }
-                    }
+                    },
                 )
             }
         }

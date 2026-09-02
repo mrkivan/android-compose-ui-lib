@@ -1,6 +1,5 @@
 package com.tnm.android.core.ui.view.widgets
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,8 +29,8 @@ fun ClickableColumnWithIcon(
     label: String,
     icon: ImageVector,
     onClick: () -> Unit,
+    isDarkMode: Boolean,
     modifier: Modifier = Modifier,
-    isDarkMode: Boolean
 ) {
     val containerColor = if (isDarkMode) {
         MaterialTheme.colorScheme.surface
@@ -39,24 +38,26 @@ fun ClickableColumnWithIcon(
         MaterialTheme.colorScheme.surfaceContainerHigh
     }
     Card(
+        // Card(onClick) instead of Modifier.clickable: the ripple is clipped to the card shape and
+        // the card is announced as a button.
+        onClick = onClick,
         modifier = modifier
-            .padding(8.dp)
-            .clickable(onClick = onClick),
+            .padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,
                 modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
 
             Text(
@@ -64,7 +65,7 @@ fun ClickableColumnWithIcon(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
             )
         }
     }
@@ -78,21 +79,21 @@ private fun PreviewClickableColumnWithIcon() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ClickableColumnWithIcon(
                     label = "Savings",
                     icon = Icons.Filled.Star,
                     onClick = {},
                     modifier = Modifier.weight(1f),
-                    isDarkMode = false
+                    isDarkMode = false,
                 )
                 ClickableColumnWithIcon(
                     label = "Investments",
                     icon = Icons.AutoMirrored.Filled.List,
                     onClick = {},
                     modifier = Modifier.weight(1f),
-                    isDarkMode = false
+                    isDarkMode = false,
                 )
             }
 
@@ -102,7 +103,7 @@ private fun PreviewClickableColumnWithIcon() {
                     icon = Icons.Filled.Add,
                     onClick = {},
                     modifier = Modifier.fillMaxWidth(),
-                    isDarkMode = false
+                    isDarkMode = false,
                 )
             }
         }

@@ -2,6 +2,7 @@ package com.tnm.android.core.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.tnm.android.core.domain.TodoTaskStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

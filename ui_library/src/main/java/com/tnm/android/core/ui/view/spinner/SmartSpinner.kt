@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +42,11 @@ fun <T> SmartSpinner(
     widgetContent: (@Composable (selectedItems: Set<T>, onClick: () -> Unit) -> Unit)? = null,
     itemContent: (@Composable (item: T, selected: Boolean) -> Unit)? = null,
 ) {
-    val selectedItemsState = rememberSaveable {
+    // remember, not rememberSaveable: the parent owns the selection (it is passed in and synced
+    // below), and Compose's saveable check accepts a HashSet without inspecting its elements —
+    // a Set of Parcelable-only items then crashed the Bundle write on rotation with
+    // "Parcelable encountered IOException writing serializable object".
+    val selectedItemsState = remember {
         mutableStateOf(selectedItems)
     }
 
@@ -76,7 +79,7 @@ fun <T> SmartSpinner(
             onDismiss = {
                 updateSelection(it)
                 showDialog.value = false
-            }
+            },
         )
     }
 
@@ -90,7 +93,7 @@ fun <T> SmartSpinner(
             onDismiss = {
                 updateSelection(it)
                 showBottomSheet.value = false
-            }
+            },
         )
     }
     val triggerClick: () -> Unit = { showSpinner(config.spinnerType) }
@@ -103,17 +106,19 @@ fun <T> SmartSpinner(
             FlatSpinnerRow(
                 selectedItems = selectedItemsState.value,
                 title = config.widgetTitle,
+                placeholder = config.widgetPlaceholder,
                 maxHeight = config.maxHeight,
                 onClick = triggerClick,
-                rowLabel = config.rowLabel
+                rowLabel = config.rowLabel,
             )
         } else {
             CardSpinnerRow(
                 selectedItems = selectedItemsState.value,
                 title = config.widgetTitle,
+                placeholder = config.widgetPlaceholder,
                 maxHeight = config.maxHeight,
                 onClick = triggerClick,
-                rowLabel = config.rowLabel
+                rowLabel = config.rowLabel,
             )
         }
     }
@@ -123,9 +128,10 @@ fun <T> SmartSpinner(
 private fun <T> FlatSpinnerRow(
     selectedItems: Set<T>,
     title: String,
+    placeholder: String,
     maxHeight: Int,
     onClick: () -> Unit,
-    rowLabel: (T) -> String
+    rowLabel: (T) -> String,
 ) {
     Column(
         modifier = Modifier
@@ -133,7 +139,7 @@ private fun <T> FlatSpinnerRow(
             .clickable(
                 onClick = onClick,
                 indication = ripple(color = MaterialTheme.colorScheme.primary),
-                interactionSource = remember { MutableInteractionSource() }
+                interactionSource = remember { MutableInteractionSource() },
             )
             .height(maxHeight.dp),
     ) {
@@ -141,8 +147,9 @@ private fun <T> FlatSpinnerRow(
         SpinnerRowContent(
             selectedItems = selectedItems,
             title = title,
+            placeholder = placeholder,
             rowLabel = rowLabel,
-            paddingInside = 16.dp
+            paddingInside = 16.dp,
         )
         Spacer(modifier = Modifier.weight(1f))
         HorizontalDivider(
@@ -150,7 +157,7 @@ private fun <T> FlatSpinnerRow(
             color = MaterialTheme.colorScheme.outlineVariant,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         )
     }
 }
@@ -159,9 +166,10 @@ private fun <T> FlatSpinnerRow(
 private fun <T> CardSpinnerRow(
     selectedItems: Set<T>,
     title: String,
+    placeholder: String,
     maxHeight: Int,
     onClick: () -> Unit,
-    rowLabel: (T) -> String
+    rowLabel: (T) -> String,
 ) {
     Surface(
         modifier = Modifier
@@ -170,18 +178,19 @@ private fun <T> CardSpinnerRow(
             .clickable(
                 onClick = onClick,
                 indication = ripple(color = MaterialTheme.colorScheme.primary),
-                interactionSource = remember { MutableInteractionSource() }
+                interactionSource = remember { MutableInteractionSource() },
             )
             .height(maxHeight.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 2.dp,
-        shadowElevation = 2.dp
+        shadowElevation = 2.dp,
     ) {
         SpinnerRowContent(
             selectedItems = selectedItems,
             title = title,
+            placeholder = placeholder,
             rowLabel = rowLabel,
-            paddingInside = 16.dp // same padding as before
+            paddingInside = 16.dp, // same padding as before
         )
     }
 }
@@ -190,32 +199,42 @@ private fun <T> CardSpinnerRow(
 private fun <T> SpinnerRowContent(
     selectedItems: Set<T>,
     title: String,
+    placeholder: String,
     rowLabel: (T) -> String,
-    paddingInside: Dp = 8.dp
+    paddingInside: Dp = 8.dp,
 ) {
-    val textColor = if (selectedItems.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+    val textColor = if (selectedItems.isEmpty()) {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(paddingInside),
         horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = if (selectedItems.isEmpty()) title
-            else selectedItems.joinToString(", ") { rowLabel(it) },
+            // widgetPlaceholder is what an empty selection shows; it used to be accepted by the
+            // config and then never read, so the title was always shown instead.
+            text = if (selectedItems.isEmpty()) {
+                placeholder.ifBlank { title }
+            } else {
+                selectedItems.joinToString(", ") { rowLabel(it) }
+            },
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
             color = textColor,
             maxLines = 2,
             modifier = Modifier.weight(1f),
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
 
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

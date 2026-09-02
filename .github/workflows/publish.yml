@@ -11,17 +11,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
-          cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Never publish an artifact that does not pass the same gate as a pull request.
+      - name: Format check and unit tests
+        run: ./gradlew spotlessCheck :ui_library:testDebugUnitTest :app:testDebugUnitTest
 
       - name: Publish library to GitHub Packages
         run: ./gradlew :ui_library:publishReleasePublicationToGitHubRepository

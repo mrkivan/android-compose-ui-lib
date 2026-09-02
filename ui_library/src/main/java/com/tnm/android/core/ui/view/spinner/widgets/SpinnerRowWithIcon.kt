@@ -42,14 +42,14 @@ fun SpinnerRowWithIcon(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         // 1. Leading Icon
         Icon(
             imageVector = icon,
             contentDescription = label,
             tint = itemIconColor,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         )
 
         Spacer(Modifier.width(12.dp))
@@ -77,11 +77,10 @@ fun SpinnerRowWithIcon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
             )
         }
     }
-
 }
 
 @Preview(showBackground = true)
@@ -104,7 +103,7 @@ private fun PreviewSpinnerRowWithIcon() {
                 isSelected = false,
                 icon = Icons.Filled.Settings,
 
-                )
+            )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // --- 3. Another Unselected State ---

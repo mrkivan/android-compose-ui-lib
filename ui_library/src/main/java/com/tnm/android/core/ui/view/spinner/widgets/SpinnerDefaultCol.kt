@@ -22,15 +22,14 @@ fun SpinnerDefaultCol(
     isSelected: Boolean,
     isMultiSelectEnable: Boolean,
     modifier: Modifier = Modifier,
-    description: String? = null
+    description: String? = null,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         // Selection indicator (top)
         if (isMultiSelectEnable) {
             Checkbox(
@@ -39,8 +38,8 @@ fun SpinnerDefaultCol(
                 colors = CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.primary,
                     uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    checkmarkColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             )
         }
 
@@ -53,7 +52,7 @@ fun SpinnerDefaultCol(
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
 
         // Optional description
@@ -66,7 +65,7 @@ fun SpinnerDefaultCol(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

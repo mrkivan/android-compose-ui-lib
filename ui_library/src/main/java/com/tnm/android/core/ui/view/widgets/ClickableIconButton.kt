@@ -29,24 +29,24 @@ fun ClickableIconButton(
     color: Color,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.wrapContentSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         IconButton(
             onClick = onClick,
             modifier = Modifier
                 .size(60.dp)
                 .clip(CircleShape)
-                .background(if (isSelected) color.copy(alpha = 0.2f) else Color.Transparent)
+                .background(if (isSelected) color.copy(alpha = 0.2f) else Color.Transparent),
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,
                 tint = color,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
             )
         }
     }
@@ -63,7 +63,7 @@ private fun PreviewClickableIconButton() {
                 color = MaterialTheme.colorScheme.primary,
                 isSelected = true,
                 onClick = {},
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         }
     }

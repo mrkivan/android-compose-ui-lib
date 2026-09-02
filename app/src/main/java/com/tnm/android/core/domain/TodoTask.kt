@@ -1,7 +1,6 @@
 package com.tnm.android.core.domain
 
 import android.os.Parcelable
-import com.tnm.android.core.data.TodoTaskStatus
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime

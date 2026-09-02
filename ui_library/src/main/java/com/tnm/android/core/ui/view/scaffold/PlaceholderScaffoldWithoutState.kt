@@ -10,12 +10,18 @@ import androidx.compose.ui.Modifier
 import com.tnm.android.core.ui.view.AppToolbarConfig
 import com.tnm.android.core.ui.view.AppTopAppBar
 
+/**
+ * [PlaceholderScaffold] without the state switch, for screens that own their own content.
+ *
+ * The [PaddingValues] handed to [bodyContent] are **already applied** by the wrapping Box; they
+ * are passed only so content can read the scaffold insets. Applying them again double-pads.
+ */
 @Composable
 fun PlaceholderScaffoldWithoutState(
     toolbarConfig: AppToolbarConfig,
     isDarkMode: Boolean,
     modifier: Modifier = Modifier,
-    bodyContent: @Composable (PaddingValues) -> Unit
+    bodyContent: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -24,7 +30,7 @@ fun PlaceholderScaffoldWithoutState(
                 isDarkMode = isDarkMode,
             )
         },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
         Box(
             modifier = Modifier

@@ -20,18 +20,21 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-
             AppTodoTaskTheme {
                 val navController = rememberNavController()
-                navController.enableOnBackPressed(true)
 
+                // Insets are deliberately zeroed here. Every screen renders its own Scaffold
+                // (PlaceholderScaffold, AppInnerScaffold, …) which applies the system-bar insets
+                // itself, and Modifier.padding does not consume them — so letting this outer
+                // Scaffold pad as well offsets every top bar by the status-bar height twice.
+                // This container exists only to host the NavHost.
                 Scaffold(
                     contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 ) { paddingValues ->
                     AppNavHost(
                         modifier = Modifier.padding(paddingValues),
-                        navController = navController
+                        navController = navController,
                     )
                 }
             }

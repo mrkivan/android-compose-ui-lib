@@ -25,6 +25,12 @@ import com.tnm.android.core.ui.view.AppToolbarConfig
 import com.tnm.android.core.ui.view.AppTopAppBar
 import com.tnm.android.core.ui.view.shape.SpacerWidthSmall
 
+/**
+ * Renders [uiState]: a spinner for Loading, a message plus Retry for Error, [bodyContent] for Success.
+ *
+ * The [PaddingValues] handed to [bodyContent] are **already applied** by the wrapping Box; they
+ * are passed only so content can read the scaffold insets. Applying them again double-pads.
+ */
 @Composable
 fun <T> PlaceholderScaffold(
     toolbarConfig: AppToolbarConfig,
@@ -32,7 +38,7 @@ fun <T> PlaceholderScaffold(
     isDarkMode: Boolean,
     modifier: Modifier = Modifier,
     onRetryClicked: () -> Unit = {},
-    bodyContent: @Composable (PaddingValues, T) -> Unit
+    bodyContent: @Composable (PaddingValues, T) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -41,7 +47,7 @@ fun <T> PlaceholderScaffold(
                 isDarkMode = isDarkMode,
             )
         },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -50,7 +56,9 @@ fun <T> PlaceholderScaffold(
         ) {
             when (uiState) {
                 is AppUiState.Loading -> LoadingView()
-                is AppUiState.Error -> ErrorView(message = uiState.message, onRetryClicked = { onRetryClicked.invoke() })
+                is AppUiState.Error -> ErrorView(message = uiState.message, onRetryClicked = {
+                    onRetryClicked.invoke()
+                })
                 is AppUiState.Success -> bodyContent(paddingValues, uiState.data)
             }
         }
@@ -62,7 +70,7 @@ fun <T> PlaceholderScaffold(
 fun LoadingView(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
     }
@@ -78,16 +86,16 @@ fun ErrorView(
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = message,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
             if (showReloadBtn) {
                 Button(onClick = onRetryClicked) {
@@ -96,7 +104,7 @@ fun ErrorView(
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = stringResource(R.string.btn_retry),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }

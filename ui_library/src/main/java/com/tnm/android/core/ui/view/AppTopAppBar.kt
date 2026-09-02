@@ -17,39 +17,35 @@ data class AppToolbarConfig(
     val navigationIcon: ImageVector? = null,
     val navigationIconContentDescription: String? = null,
     val onNavigationClick: (() -> Unit)? = null,
-    val actions: List<ToolbarAction> = emptyList()
+    val actions: List<ToolbarAction> = emptyList(),
 )
 
-data class ToolbarAction(
-    val icon: ImageVector,
-    val contentDescription: String?,
-    val onClick: () -> Unit
-)
+data class ToolbarAction(val icon: ImageVector, val contentDescription: String?, val onClick: () -> Unit)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppTopAppBar(
-    toolbarConfig: AppToolbarConfig,
-    isDarkMode: Boolean,
-    modifier: Modifier = Modifier,
-) {
-
+fun AppTopAppBar(toolbarConfig: AppToolbarConfig, isDarkMode: Boolean, modifier: Modifier = Modifier) {
     // Primary background based on theme
     val backgroundColor =
-        if (isDarkMode) DARK_MODE_TOPBAR_COLOR
-        else MaterialTheme.colorScheme.primary
+        if (isDarkMode) {
+            DARK_MODE_TOPBAR_COLOR
+        } else {
+            MaterialTheme.colorScheme.primary
+        }
 
     // Text/icon color based on background
     val contentColor =
-        if (isDarkMode) MaterialTheme.colorScheme.onSurfaceVariant
-        else MaterialTheme.colorScheme.onPrimary
-
+        if (isDarkMode) {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        } else {
+            MaterialTheme.colorScheme.onPrimary
+        }
 
     TopAppBar(
         title = {
             TvTitleMedium(
                 text = toolbarConfig.title,
-                color = contentColor
+                color = contentColor,
             )
         },
         navigationIcon = {
@@ -58,7 +54,7 @@ fun AppTopAppBar(
                     Icon(
                         imageVector = icon,
                         contentDescription = toolbarConfig.navigationIconContentDescription,
-                        tint = contentColor
+                        tint = contentColor,
                     )
                 }
             }
@@ -69,7 +65,7 @@ fun AppTopAppBar(
                     Icon(
                         imageVector = action.icon,
                         contentDescription = action.contentDescription,
-                        tint = contentColor
+                        tint = contentColor,
                     )
                 }
             }
@@ -78,8 +74,8 @@ fun AppTopAppBar(
             containerColor = backgroundColor,
             titleContentColor = contentColor,
             navigationIconContentColor = contentColor,
-            actionIconContentColor = contentColor
+            actionIconContentColor = contentColor,
         ),
-        modifier = modifier
+        modifier = modifier,
     )
 }

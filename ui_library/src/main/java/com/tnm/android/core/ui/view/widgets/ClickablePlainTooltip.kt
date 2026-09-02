@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 fun ClickablePlainTooltip(
     label: String,
     modifier: Modifier = Modifier,
-    content: @Composable (showTooltip: () -> Unit) -> Unit
+    content: @Composable (showTooltip: () -> Unit) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -37,7 +37,7 @@ fun ClickablePlainTooltip(
                 Text(label)
             }
         },
-        state = tooltipState
+        state = tooltipState,
     ) {
         content(showTooltip)
     }

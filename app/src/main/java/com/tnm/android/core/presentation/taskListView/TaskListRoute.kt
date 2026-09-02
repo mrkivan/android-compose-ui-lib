@@ -5,9 +5,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 
 @Composable
-fun TaskListRoute(
-    navController: NavHostController,
-    viewModel: TaskListViewModel = hiltViewModel()
-) {
+fun TaskListRoute(navController: NavHostController, viewModel: TaskListViewModel = hiltViewModel()) {
     TaskListScreen(navController, viewModel)
 }

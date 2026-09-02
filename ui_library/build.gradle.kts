@@ -24,15 +24,15 @@ extensions.configure<LibraryExtension> {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
 
     buildFeatures {
-        resValues = true
         compose = true
-        buildConfig = true
+        // No BuildConfig/resValues: nothing in the library reads them, and a library BuildConfig
+        // lands on every consumer's classpath.
     }
 
     compileOptions {
@@ -40,17 +40,25 @@ extensions.configure<LibraryExtension> {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests {
+            // Model classes are @Parcelize; without this the android.jar stubs throw.
+            isReturnDefaultValues = true
+        }
+    }
+
     packaging {
-        resources.excludes += setOf(
-            "/META-INF/AL2.0",
-            "/META-INF/LGPL2.1"
-        )
+        resources.excludes +=
+            setOf(
+                "/META-INF/AL2.0",
+                "/META-INF/LGPL2.1",
+            )
     }
 
     publishing {
         singleVariant("release") {
             withSourcesJar()
-            withJavadocJar()
+            // No withJavadocJar(): without Dokka it publishes an empty jar.
         }
     }
 }
@@ -61,23 +69,25 @@ kotlin {
 
 dependencies {
     // ---------- Implementation Dependencies ----------
+    // Every dependency here is forced on every consumer. Anything not referenced from
+    // src/main stays out (activity-compose, navigation, runtime-livedata were removed for that reason).
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    // api: BaseDataLoadingViewModel extends ViewModel, so consumers need the type on their
+    // compile classpath. It used to arrive transitively via activity-compose.
+    api(libs.androidx.lifecycle.viewmodel.ktx)
 
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling)
+    // Tooling runtime is debug-only: shipping it forces the Compose inspector onto every
+    // consumer's release build. The preview annotations stay on the main classpath.
+    debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.compose.material.icons.extended)
-    implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.compose.ui.unit)
-    implementation(libs.androidx.compose.ui.graphics)
 
     // ---------- Test Dependencies ----------
     testImplementation(libs.junit)
@@ -98,7 +108,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = "com.tnm.android.core"
                 artifactId = "ui-library"
-                version = "2.4.2"
+                version = "3.0.0"
                 from(components["release"])
             }
         }

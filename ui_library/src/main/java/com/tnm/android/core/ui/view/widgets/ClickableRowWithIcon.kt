@@ -1,6 +1,5 @@
 package com.tnm.android.core.ui.view.widgets
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,8 +30,8 @@ fun ClickableRowWithIcon(
     label: String,
     icon: ImageVector,
     onClick: () -> Unit,
+    isDarkMode: Boolean,
     modifier: Modifier = Modifier,
-    isDarkMode: Boolean
 ) {
     val containerColor = if (isDarkMode) {
         MaterialTheme.colorScheme.surface
@@ -40,25 +39,27 @@ fun ClickableRowWithIcon(
         MaterialTheme.colorScheme.surfaceContainerHigh
     }
     Card(
+        // Card(onClick) instead of Modifier.clickable: the ripple is clipped to the card shape and
+        // the card is announced as a button.
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick.invoke() },
+            .padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
 
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = MaterialTheme.colorScheme.onSurface,
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -68,9 +69,8 @@ fun ClickableRowWithIcon(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
 
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
-
         }
     }
 }
@@ -83,21 +83,21 @@ private fun PreviewClickableColumnWithIcon() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 ClickableRowWithIcon(
                     label = "Transfer",
                     icon = Icons.Filled.Settings,
                     onClick = { /* Preview click action */ },
                     modifier = Modifier.weight(1f),
-                    isDarkMode = false
+                    isDarkMode = false,
                 )
                 ClickableRowWithIcon(
                     label = "Pay Bills",
                     icon = Icons.Filled.Info,
                     onClick = { /* Preview click action */ },
                     modifier = Modifier.weight(1f),
-                    isDarkMode = false
+                    isDarkMode = false,
                 )
             }
             ClickableRowWithIcon(
@@ -105,7 +105,7 @@ private fun PreviewClickableColumnWithIcon() {
                 icon = Icons.Filled.Add,
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
-                isDarkMode = false
+                isDarkMode = false,
             )
         }
     }

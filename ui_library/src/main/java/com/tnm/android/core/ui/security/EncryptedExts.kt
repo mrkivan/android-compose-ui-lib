@@ -18,8 +18,7 @@ value class EncryptedBigDecimal(val value: String) {
         private fun getCryptoManager() = EncryptionInitializer.getManager()
 
         fun encrypt(amount: BigDecimal) = EncryptedBigDecimal(getCryptoManager().encrypt(amount.toPlainString()))
-        fun decrypt(encrypted: EncryptedBigDecimal): BigDecimal {
-            return BigDecimal(getCryptoManager().decrypt(encrypted.value))
-        }
+        fun decrypt(encrypted: EncryptedBigDecimal): BigDecimal =
+            BigDecimal(getCryptoManager().decrypt(encrypted.value))
     }
 }

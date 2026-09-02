@@ -1,6 +1,7 @@
 package com.tnm.android.core
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,9 +22,7 @@ object AppTodoTaskDestinations {
 }
 
 object NavKeys {
-    const val DATA_KEY_TODO_TASK = "todo_task_object"
     const val DATA_KEY_SPINNER_CONFIG = "spinner_config"
-
 }
 
 @Composable
@@ -32,7 +31,6 @@ fun AppNavHost(
     navController: NavHostController,
     startDestination: String = AppTodoTaskDestinations.ROUTE_HOME,
 ) {
-
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -40,7 +38,6 @@ fun AppNavHost(
     ) {
         composable(route = AppTodoTaskDestinations.ROUTE_HOME) {
             WidgetShowcaseRoute(navController)
-
         }
         composable(route = AppTodoTaskDestinations.ROUTE_ADD_TODO_TASK) {
             TaskListRoute(navController)
@@ -61,18 +58,22 @@ fun AppNavHost(
                 ?.savedStateHandle
                 ?.get<SmartSpinnerConfig<TestSpinnerData>>(NavKeys.DATA_KEY_SPINNER_CONFIG)
 
-            savedSpinnerConfig?.let {
-                SpinnerFullScreenScreen(
-                    config = it.copy(
-                        rowLabel = { it.title }
-                    ),
-                    dataItems = spinnerData,
-                    selectedItems = selectedData,
-                    navController = navController,
-                )
+            if (savedSpinnerConfig == null) {
+                // Reached without a config (deep link, or the caller forgot to set it): a blank
+                // screen with no way out is worse than going back.
+                LaunchedEffect(Unit) { navController.popBackStack() }
+                return@composable
             }
 
-
+            SpinnerFullScreenScreen(
+                // Lambdas are @IgnoredOnParcel; re-supply them after the SavedStateHandle round trip.
+                config = savedSpinnerConfig.copy(
+                    rowLabel = { item -> item.title },
+                ),
+                dataItems = spinnerData,
+                selectedItems = selectedData,
+                navController = navController,
+            )
         }
     }
 }

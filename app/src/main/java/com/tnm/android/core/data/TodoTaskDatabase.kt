@@ -7,7 +7,7 @@ import androidx.room.TypeConverters
 @Database(
     entities = [TodoTaskEntity::class],
     version = 1,
-    exportSchema = true
+    exportSchema = true,
 )
 @TypeConverters(AppDataConverter::class)
 abstract class TodoTaskDatabase : RoomDatabase() {

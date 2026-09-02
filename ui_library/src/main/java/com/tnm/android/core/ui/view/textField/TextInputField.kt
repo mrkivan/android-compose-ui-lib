@@ -26,33 +26,38 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
+/**
+ * @param isDarkMode Ignored. Colours come from [MaterialTheme]; the parameter stays so 2.x call
+ * sites keep compiling and will be removed in 4.0.
+ */
 @Composable
 fun TextInputField(
-    modifier: Modifier = Modifier,
     value: String,
     config: TextInputConfig,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    isDarkMode: Boolean
+    @Suppress("UNUSED_PARAMETER") isDarkMode: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
-    //var isFocused by remember { mutableStateOf(false) }
 
     // -------------------- designFlat vs card style --------------------
     val backgroundColor = if (config.designFlat) Color.Transparent else MaterialTheme.colorScheme.surface
     val shape = if (config.designFlat) RectangleShape else MaterialTheme.shapes.medium
     val elevation = if (config.designFlat) 0.dp else 2.dp
-    val contentPadding = if (config.designFlat) PaddingValues(horizontal = 0.dp, vertical = 4.dp)
-    else PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+    val contentPadding = if (config.designFlat) {
+        PaddingValues(horizontal = 0.dp, vertical = 4.dp)
+    } else {
+        PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+    }
 
-    val textColor = if (isDarkMode) Color.White else Color.Black
+    val textColor = MaterialTheme.colorScheme.onSurface
 
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = shape,
         color = backgroundColor,
         tonalElevation = elevation,
-        shadowElevation = elevation
+        shadowElevation = elevation,
     ) {
         TextField(
             value = value,
@@ -62,35 +67,33 @@ fun TextInputField(
             maxLines = config.resolvedMaxLines(),
             modifier = Modifier
                 .fillMaxWidth()
-                //.onFocusChanged { isFocused = it.isFocused }
                 .padding(contentPadding),
             textStyle = LocalTextStyle.current.copy(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
-                color = textColor
+                color = textColor,
             ),
             label = config.label?.let { { Text(it) } },
             placeholder = config.placeholder?.let { { Text(it) } },
             keyboardOptions = KeyboardOptions(
                 keyboardType = config.keyboardType,
                 imeAction = config.imeAction,
-                capitalization = config.capitalization
+                capitalization = config.capitalization,
             ),
             keyboardActions = KeyboardActions(
                 onDone = { focusManager.clearFocus() },
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
             colors = transparentTextFieldColors(),
-            visualTransformation = config.visualTransformation
+            visualTransformation = config.visualTransformation,
         )
     }
 }
 
-
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES, // <- Dark mode
-    name = "Dark Mode Preview"
+    name = "Dark Mode Preview",
 )
 @Composable
 fun PreviewTextInputField() {
@@ -101,7 +104,7 @@ fun PreviewTextInputField() {
                 config = TextInputConfig(
                     placeholder = "Enter your asset name here...",
                     imeAction = ImeAction.Next,
-                    designFlat = true
+                    designFlat = true,
                 ),
                 modifier = Modifier.padding(16.dp),
                 isDarkMode = false,
@@ -112,10 +115,10 @@ fun PreviewTextInputField() {
                 config = TextInputConfig(
                     placeholder = "New asset!",
                     imeAction = ImeAction.Next,
-                    designFlat = false
+                    designFlat = false,
                 ),
                 modifier = Modifier.padding(16.dp),
-                isDarkMode = false
+                isDarkMode = false,
             )
         }
     }

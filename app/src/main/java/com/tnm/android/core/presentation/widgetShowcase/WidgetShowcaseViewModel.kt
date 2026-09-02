@@ -2,72 +2,39 @@ package com.tnm.android.core.presentation.widgetShowcase
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tnm.android.core.domain.AddTodoTaskUseCase
-import com.tnm.android.core.domain.UpdateTodoTaskUseCase
+import com.tnm.android.core.ui.intent.AppUiIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WidgetShowcaseViewModel @Inject constructor(
-    private val addTodoTaskUseCase: AddTodoTaskUseCase,
-    private val updateTodoTaskUseCase: UpdateTodoTaskUseCase,
-) : ViewModel() {
+class WidgetShowcaseViewModel @Inject constructor() : ViewModel() {
 
-    private val _notificationMessage = MutableSharedFlow<String?>()
-    val notificationMessage = _notificationMessage.asSharedFlow()
+    // Channel, not SharedFlow: navigation and messages are one-shot effects that must not replay
+    // on rotation. The previous four separate SharedFlows overlapped, and one of them was never
+    // emitted to at all.
+    private val _events = Channel<WidgetShowcaseEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
-    private val _navigateToHome = MutableSharedFlow<Boolean>()
-    val navigateToHome = _navigateToHome.asSharedFlow()
-
-    private val _showWarningDialog = MutableSharedFlow<Boolean>()
-    val showWarningDialog = _showWarningDialog.asSharedFlow()
-    private val _navigationEvents = MutableSharedFlow<WidgetShowcaseNavEvent>()
-    val navigationEvents = _navigationEvents.asSharedFlow()
-
-    fun handleIntent(intent: WidgetShowcaseIntent) {
+    fun handleIntent(intent: AppUiIntent) {
         when (intent) {
-            is WidgetShowcaseIntent.LoadData -> {
-                // TODO
-            }
+            is WidgetShowcaseIntent.BackPressed ->
+                emit(WidgetShowcaseEvent.ShowLeaveWarning)
 
-            is WidgetShowcaseIntent.ShowWarningPopup -> showWarningPopup()
-            is WidgetShowcaseIntent.ValidateData -> validateAndSaveData()
-            is WidgetShowcaseIntent.NavigateToTaskList -> {
-                viewModelScope.launch {
-                    _navigationEvents.emit(WidgetShowcaseNavEvent.NavToTaskListScreen)
-                }
-            }
-        }
+            is WidgetShowcaseIntent.ConfirmLeave ->
+                emit(WidgetShowcaseEvent.NavigateBack)
 
-    }
+            is WidgetShowcaseIntent.ValidateData ->
+                emit(WidgetShowcaseEvent.NavigateBack)
 
-    fun validateDate(): Boolean {
-        // TODO
-        return true
-    }
-
-    fun showWarningPopup() {
-        // TODO
-        viewModelScope.launch {
-            _navigateToHome.emit(true)
+            is WidgetShowcaseIntent.NavigateToTaskList ->
+                emit(WidgetShowcaseEvent.NavigateToTaskList)
         }
     }
 
-    private fun setNotificationMessage(message: String?) {
-        viewModelScope.launch {
-            _notificationMessage.emit(message)
-        }
+    private fun emit(event: WidgetShowcaseEvent) {
+        viewModelScope.launch { _events.send(event) }
     }
-
-    private fun validateAndSaveData() {
-        // TODO
-        viewModelScope.launch {
-            _navigateToHome.emit(true)
-        }
-    }
-
-
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnm.android.core.ui.view.textField.NumberInputConfig
-import com.tnm.android.core.ui.view.textField.NumberInputTexField
+import com.tnm.android.core.ui.view.textField.NumberInputTextField
 
 @Composable
 fun InputNumberRowWithLabel(
@@ -27,15 +27,17 @@ fun InputNumberRowWithLabel(
     maxValue: Float,
     onValueChange: (Float) -> Unit,
     suffix: String,
+    modifier: Modifier = Modifier,
 ) {
-    var textInput by remember { mutableStateOf(value.toBigDecimal()) }
+    // Keyed on value so a new value from the caller is not ignored after first composition.
+    var textInput by remember(value) { mutableStateOf(value.toBigDecimal()) }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
@@ -44,10 +46,10 @@ fun InputNumberRowWithLabel(
             maxLines = 2,
             minLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
 
-        NumberInputTexField(
+        NumberInputTextField(
             modifier = Modifier.weight(1f),
             initValue = textInput,
             maxValue = maxValue.toBigDecimal(),
@@ -60,15 +62,15 @@ fun InputNumberRowWithLabel(
                 },
                 placeholder = "0",
                 withoutDecimal = true,
-                isRequired = true
-            )
+                isRequired = true,
+            ),
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun EditLimitScreenPreview() {
+private fun EditLimitScreenPreview() {
     MaterialTheme {
         InputNumberRowWithLabel(
             label = "Test Label",

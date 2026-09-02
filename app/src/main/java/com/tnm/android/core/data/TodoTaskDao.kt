@@ -6,6 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.tnm.android.core.domain.TodoTaskStatus
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoTaskDao {
@@ -16,13 +18,13 @@ interface TodoTaskDao {
     @Update
     suspend fun updateTodoTask(todoTask: TodoTaskEntity)
 
+    // Flow, not List: Room re-emits on every write to the table, so the UI updates itself after
+    // an insert/update/delete instead of needing a manual re-fetch.
     @Query("SELECT * FROM table_todo_task ORDER BY insertAt DESC")
-    suspend fun getAllTask(): List<TodoTaskEntity>
+    fun observeAllTasks(): Flow<List<TodoTaskEntity>>
 
-    @Query("SELECT * FROM table_todo_task where status = :status ORDER BY insertAt DESC")
-    suspend fun getTodoTaskByStatus(
-        status: TodoTaskStatus = TodoTaskStatus.PENDING
-    ): List<TodoTaskEntity>
+    @Query("SELECT * FROM table_todo_task WHERE status = :status ORDER BY insertAt DESC")
+    fun observeTasksByStatus(status: TodoTaskStatus): Flow<List<TodoTaskEntity>>
 
     @Delete
     suspend fun deleteTodoTask(todoTask: TodoTaskEntity)

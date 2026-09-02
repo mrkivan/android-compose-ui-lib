@@ -1,5 +1,6 @@
 package com.tnm.android.core.ui.view.dropdown
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -16,9 +17,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tnm.android.core.ui.R
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** Kept for source compatibility with 2.x; the name was misspelled. */
+@Deprecated(
+    message = "Renamed to AppExpandableDropdown.",
+    replaceWith = ReplaceWith(
+        "AppExpandableDropdown(items, selectedItem, onItemSelected, modifier, headerContent, itemContent, sort)",
+    ),
+)
 @Composable
 fun <T> AppExpendableDropdown(
     items: List<T>,
@@ -27,7 +36,19 @@ fun <T> AppExpendableDropdown(
     modifier: Modifier = Modifier,
     headerContent: @Composable (T, @Composable () -> Unit, Boolean) -> Unit,
     itemContent: @Composable (T, Boolean) -> Unit,
-    sort: ((List<T>) -> List<T>) = { it }
+    sort: ((List<T>) -> List<T>) = { it },
+) = AppExpandableDropdown(items, selectedItem, onItemSelected, modifier, headerContent, itemContent, sort)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> AppExpandableDropdown(
+    items: List<T>,
+    selectedItem: T,
+    onItemSelected: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    headerContent: @Composable (T, @Composable () -> Unit, Boolean) -> Unit,
+    itemContent: @Composable (T, Boolean) -> Unit,
+    sort: ((List<T>) -> List<T>) = { it },
 ) {
     var expanded by remember { mutableStateOf(false) }
     var currentItem by remember(selectedItem) { mutableStateOf(selectedItem) }
@@ -37,35 +58,41 @@ fun <T> AppExpendableDropdown(
     val firstItem = sortedItems.firstOrNull() ?: selectedItem
 
     if (sortedItems.size <= 1) {
-        headerContent(
-            firstItem,          // Position 1: Item
-            { /* None */ },     // Position 2: TrailingIconComposable
-            true                // Position 3: isSelected
-        )
+        // Caller's modifier still has to apply on this path.
+        Box(modifier = modifier) {
+            headerContent(
+                firstItem, // Position 1: Item
+                { /* None */ }, // Position 2: TrailingIconComposable
+                true, // Position 3: isSelected
+            )
+        }
         return
     }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        modifier = modifier
+        modifier = modifier,
     ) {
         // --- ANCHOR / HEADER
         headerContent(
-            currentItem,        // Position 1: Item
-            {                   // Position 2: TrailingIconComposable
+            currentItem, // Position 1: Item
+            {
+                // Position 2: TrailingIconComposable
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (expanded) "Collapse dropdown" else "Expand dropdown"
+                    contentDescription = stringResource(
+                        if (expanded) R.string.dropdown_collapse else R.string.dropdown_expand,
+                    ),
                 )
             },
-            true                // Position 3: isSelected
+            true, // Position 3: isSelected
         )
 
         // --- DROPDOWN MENU ---
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             sortedItems.forEachIndexed { index, item ->
                 val isSelected = item == currentItem
@@ -74,8 +101,8 @@ fun <T> AppExpendableDropdown(
                     // Render the content using the ItemContent slot (Invoked with positional arguments)
                     text = {
                         itemContent(
-                            item,       // Position 1: Item
-                            isSelected  // Position 2: isSelected
+                            item, // Position 1: Item
+                            isSelected, // Position 2: isSelected
                         )
                     },
                     onClick = {
@@ -86,7 +113,7 @@ fun <T> AppExpendableDropdown(
                         expanded = false
                     },
                     contentPadding = PaddingValues(0.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 if (index < sortedItems.lastIndex) {

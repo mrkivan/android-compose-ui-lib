@@ -10,7 +10,7 @@ fun TodoTaskEntity.toDomain() = TodoTask(
     selectedTime = selectedTime,
     scheduleAt = scheduleAt,
     insertAt = insertAt,
-    status = status
+    status = status,
 )
 
 fun TodoTask.toEntity() = TodoTaskEntity(
@@ -21,5 +21,5 @@ fun TodoTask.toEntity() = TodoTaskEntity(
     selectedTime = selectedTime,
     scheduleAt = scheduleAt,
     insertAt = insertAt,
-    status = status
+    status = status,
 )

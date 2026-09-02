@@ -26,14 +26,15 @@ import com.tnm.android.core.ui.view.extensions.getAlpha
 
 @Composable
 fun BaseCardView(
-    bodyContent: @Composable () -> Unit,
     onClick: () -> Unit,
     isEnable: Boolean,
     modifier: Modifier = Modifier,
     surfaceColor: Color = MaterialTheme.colorScheme.surface,
-    minHeight: Int = MAX_WIDGET_HEIGHT
+    minHeight: Int = MAX_WIDGET_HEIGHT,
+    // Last so trailing-lambda syntax works: as the first parameter it bound to minHeight and
+    // the documented call style did not compile.
+    bodyContent: @Composable () -> Unit,
 ) {
-
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -44,11 +45,11 @@ fun BaseCardView(
                 enabled = isEnable,
                 onClick = onClick,
                 indication = ripple(color = MaterialTheme.colorScheme.primary),
-                interactionSource = remember { MutableInteractionSource() }
+                interactionSource = remember { MutableInteractionSource() },
             ),
         color = surfaceColor,
         tonalElevation = 2.dp,
-        shadowElevation = 2.dp
+        shadowElevation = 2.dp,
     ) {
         Column(
             modifier = Modifier
@@ -56,10 +57,10 @@ fun BaseCardView(
                 .fillMaxHeight()
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             CompositionLocalProvider(
-                LocalContentColor provides MaterialTheme.colorScheme.onSurface
+                LocalContentColor provides MaterialTheme.colorScheme.onSurface,
             ) {
                 bodyContent()
             }

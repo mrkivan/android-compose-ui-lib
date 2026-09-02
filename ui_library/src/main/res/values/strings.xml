@@ -5,5 +5,14 @@
     <string name="search">Search</string>
     <string name="done">Done</string>
     <string name="search_empty">No items found!</string>
+    <string name="search_hint">Search…</string>
+    <string name="color_picker_hue">Hue: %1$d</string>
+    <string name="color_picker_cancel">Cancel</string>
+    <string name="donut_chart_total">Total</string>
+    <string name="dropdown_expand">Expand dropdown</string>
+    <string name="dropdown_collapse">Collapse dropdown</string>
+    <string name="passcode_delete">Delete last digit</string>
+    <string name="passcode_biometric">Use biometric unlock</string>
+    <string name="navigate_back">Navigate back</string>
 
 </resources>

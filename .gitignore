@@ -15,4 +15,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/schemas/*
+
+# Room schemas under app/schemas are intentionally tracked: they are the migration history
+# and exportSchema = true writes them on every build.

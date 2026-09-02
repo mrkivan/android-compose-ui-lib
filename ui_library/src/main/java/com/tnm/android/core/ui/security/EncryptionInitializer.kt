@@ -9,7 +9,9 @@ object EncryptionInitializer {
 
     fun getManager(): EncryptionManager {
         if (!::encryptionManager.isInitialized) {
-            error("EncryptionManager has not been initialized. Call EncryptionInitializer.initialize() in your Application class.")
+            error(
+                "EncryptionManager has not been initialized. Call EncryptionInitializer.initialize() in your Application class.",
+            )
         }
         return encryptionManager
     }

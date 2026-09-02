@@ -43,15 +43,14 @@ fun SpinnerColWithIcon(
         modifier = modifier
             .fillMaxWidth()
             .padding(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         // Icon (top)
         Icon(
             imageVector = icon,
             contentDescription = label,
             tint = iconColor,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(28.dp),
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -64,7 +63,7 @@ fun SpinnerColWithIcon(
             textAlign = TextAlign.Center,
             minLines = 2,
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
 
         // Optional description
@@ -76,7 +75,7 @@ fun SpinnerColWithIcon(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -101,14 +100,14 @@ private fun PreviewSpinnerColWithIcon() {
             columns = GridCells.Fixed(3),
             modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
                 SpinnerColWithIcon(
                     label = "Food & Dining",
                     description = "Selected",
                     isSelected = true,
-                    icon = Icons.Filled.Fastfood
+                    icon = Icons.Filled.Fastfood,
                 )
             }
 
@@ -116,7 +115,7 @@ private fun PreviewSpinnerColWithIcon() {
                 SpinnerColWithIcon(
                     label = "Utilities",
                     isSelected = false,
-                    icon = Icons.Filled.Settings
+                    icon = Icons.Filled.Settings,
                 )
             }
 
@@ -124,7 +123,7 @@ private fun PreviewSpinnerColWithIcon() {
                 SpinnerColWithIcon(
                     label = "Travel",
                     isSelected = false,
-                    icon = Icons.Filled.LocationOn
+                    icon = Icons.Filled.LocationOn,
                 )
             }
         }

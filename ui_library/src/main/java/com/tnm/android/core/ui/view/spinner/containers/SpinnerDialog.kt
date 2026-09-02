@@ -29,21 +29,21 @@ fun <T> SpinnerDialog(
     var newSelectedItems by remember { mutableStateOf(selectedItems) }
 
     Dialog(
-        onDismissRequest = { onDismiss(newSelectedItems) }
+        onDismissRequest = { onDismiss(newSelectedItems) },
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth()                 // take maximum width
-                .heightIn(max = 720.dp)         // wrap height with safe cap
+                .fillMaxWidth() // take maximum width
+                .heightIn(max = 720.dp) // wrap height with safe cap
                 .padding(4.dp),
             shape = MaterialTheme.shapes.extraLarge,
             tonalElevation = 8.dp,
             color = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             Column(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(4.dp),
             ) {
                 // Top Bar
                 SpinnerTopBar(
@@ -61,9 +61,8 @@ fun <T> SpinnerDialog(
                     onSelectionChanged = { newSelectedItems = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f, fill = false) // key for wrap behavior
+                        .weight(1f, fill = false), // key for wrap behavior
                 )
-
             }
         }
     }

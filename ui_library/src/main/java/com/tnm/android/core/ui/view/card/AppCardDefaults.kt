@@ -15,6 +15,6 @@ object AppCardDefaults {
     @Composable
     fun colors() = CardDefaults.cardColors(
         containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
+        contentColor = MaterialTheme.colorScheme.onSurface,
     )
 }

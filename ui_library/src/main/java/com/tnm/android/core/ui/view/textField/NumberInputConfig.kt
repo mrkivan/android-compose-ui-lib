@@ -12,5 +12,5 @@ data class NumberInputConfig(
     val withoutDecimal: Boolean = false,
     val isRequired: Boolean = false,
     val textAlign: TextAlign = TextAlign.Start,
-    val designFlat: Boolean = false
+    val designFlat: Boolean = false,
 )

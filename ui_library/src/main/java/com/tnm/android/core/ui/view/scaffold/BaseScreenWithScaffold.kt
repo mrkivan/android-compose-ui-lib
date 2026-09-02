@@ -27,5 +27,4 @@ fun BaseScreenWithScaffold(
             content()
         }
     }
-
 }

@@ -44,23 +44,28 @@ fun <T> SpinnerFullScreenScreen(
                 toolbarConfig = AppToolbarConfig(
                     title = config.widgetTitle,
                     navigationIcon = Icons.AutoMirrored.Filled.ArrowBack,
+                    navigationIconContentDescription = stringResource(R.string.navigate_back),
                     onNavigationClick = {
                         navController.navigateUp()
                     },
                     actions = listOfNotNull(
-                        if (config.multiSelectEnable) ToolbarAction(
-                            icon = Icons.Default.Check,
-                            contentDescription = stringResource(R.string.done),
-                            onClick = {
-                                navController.previousBackStackEntry
-                                    ?.savedStateHandle
-                                    ?.set(
-                                        SpinnerNavKeys.DATA_KEY_SELECTED_ITEMS,
-                                        ArrayList(newSelectedItems)
-                                    )
-                                navController.popBackStack()
-                            }
-                        ) else null,
+                        if (config.multiSelectEnable) {
+                            ToolbarAction(
+                                icon = Icons.Default.Check,
+                                contentDescription = stringResource(R.string.done),
+                                onClick = {
+                                    navController.previousBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set(
+                                            SpinnerNavKeys.DATA_KEY_SELECTED_ITEMS,
+                                            ArrayList(newSelectedItems),
+                                        )
+                                    navController.popBackStack()
+                                },
+                            )
+                        } else {
+                            null
+                        },
                     ),
                 ),
                 isDarkMode = isSystemInDarkTheme(),
@@ -72,7 +77,7 @@ fun <T> SpinnerFullScreenScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentAlignment = Alignment.TopStart
+            contentAlignment = Alignment.TopStart,
         ) {
             SpinnerContent(
                 config = config,
@@ -85,17 +90,15 @@ fun <T> SpinnerFullScreenScreen(
                         ?.savedStateHandle
                         ?.set(
                             SpinnerNavKeys.DATA_KEY_SELECTED_ITEMS,
-                            ArrayList(data)
+                            ArrayList(data),
                         )
                     navController.popBackStack()
                 },
                 dataItems = dataItems,
                 selectedItems = newSelectedItems,
                 itemContent = itemContent,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         }
-
     }
-
 }

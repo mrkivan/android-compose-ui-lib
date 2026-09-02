@@ -39,9 +39,23 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-// ---------------------------- NumberInputTexField ----------------------------
+// ---------------------------- NumberInputTextField ----------------------------
+
+/** Kept for source compatibility with 2.x; the name was misspelled. */
+@Deprecated(
+    message = "Renamed to NumberInputTextField.",
+    replaceWith = ReplaceWith("NumberInputTextField(modifier, initValue, maxValue, config)"),
+)
 @Composable
 fun NumberInputTexField(
+    modifier: Modifier = Modifier,
+    initValue: BigDecimal? = null,
+    maxValue: BigDecimal? = null,
+    config: NumberInputConfig,
+) = NumberInputTextField(modifier, initValue, maxValue, config)
+
+@Composable
+fun NumberInputTextField(
     modifier: Modifier = Modifier,
     initValue: BigDecimal? = null,
     maxValue: BigDecimal? = null,
@@ -49,15 +63,20 @@ fun NumberInputTexField(
 ) {
     val symbols = remember { DecimalFormatSymbols(Locale.US) }
     val pattern = if (config.withoutDecimal) "#,##0" else "#,##0.00"
-    val decimalFormatAlwaysTwo = remember { DecimalFormat(pattern, symbols) }
+    // Keyed on the pattern: an unkeyed remember kept the first formatter after withoutDecimal changed.
+    val decimalFormatAlwaysTwo = remember(pattern) { DecimalFormat(pattern, symbols) }
 
     var textFieldValue by remember {
         mutableStateOf(
             TextFieldValue(
-                text = if (initValue != null) decimalFormatAlwaysTwo.format(initValue)
-                    .orEmpty() else "",
-                selection = TextRange(Int.MAX_VALUE)
-            )
+                text = if (initValue != null) {
+                    decimalFormatAlwaysTwo.format(initValue)
+                        .orEmpty()
+                } else {
+                    ""
+                },
+                selection = TextRange(Int.MAX_VALUE),
+            ),
         )
     }
 
@@ -68,7 +87,7 @@ fun NumberInputTexField(
         textFieldValue = initValue?.let {
             TextFieldValue(
                 formatFlexible(it.toPlainString(), config.withoutDecimal),
-                TextRange(Int.MAX_VALUE)
+                TextRange(Int.MAX_VALUE),
             )
         } ?: TextFieldValue("")
     }
@@ -77,7 +96,7 @@ fun NumberInputTexField(
         if (isFocused) {
             // Select all text on focus to allow overwriting the entire value when typing starts
             textFieldValue = textFieldValue.copy(
-                selection = TextRange(0, textFieldValue.text.length)
+                selection = TextRange(0, textFieldValue.text.length),
             )
         } else {
             val raw = textFieldValue.text.replace(",", "")
@@ -96,15 +115,18 @@ fun NumberInputTexField(
     val backgroundColor = if (config.designFlat) Color.Transparent else MaterialTheme.colorScheme.surface
     val shape = if (config.designFlat) RectangleShape else MaterialTheme.shapes.medium
     val elevation = if (config.designFlat) 0.dp else 2.dp
-    val contentPadding = if (config.designFlat) PaddingValues(horizontal = 0.dp, vertical = 4.dp)
-    else PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+    val contentPadding = if (config.designFlat) {
+        PaddingValues(horizontal = 0.dp, vertical = 4.dp)
+    } else {
+        PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+    }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = shape,
         color = backgroundColor,
         tonalElevation = elevation,
-        shadowElevation = elevation
+        shadowElevation = elevation,
     ) {
         TextField(
             value = textFieldValue,
@@ -115,7 +137,7 @@ fun NumberInputTexField(
 
                 val raw = normalizedText.replace(",", "")
 
-                if (!isValidInput(raw, config.maxLength)) return@TextField
+                if (!isValidInput(raw, config.maxLength, config.withoutDecimal)) return@TextField
 
                 if (raw.isEmpty()) {
                     textFieldValue = TextFieldValue("", selection = TextRange(0))
@@ -127,17 +149,18 @@ fun NumberInputTexField(
 
                 textFieldValue = TextFieldValue(
                     text = formatted,
-                    selection = TextRange(formatted.length) // cursor always at end
+                    selection = TextRange(formatted.length), // cursor always at end
                 )
 
                 parseBigDecimal(raw, maxValue)?.let { config.onValueChange(it) }
             },
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal,
-                imeAction = ImeAction.Done
+                // No decimal key at all when decimals are not accepted.
+                keyboardType = if (config.withoutDecimal) KeyboardType.Number else KeyboardType.Decimal,
+                imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
+                onDone = { focusManager.clearFocus() },
             ),
             singleLine = true,
             modifier = Modifier
@@ -151,7 +174,7 @@ fun NumberInputTexField(
                 textAlign = config.textAlign,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             ),
             placeholder = {
                 config.placeholder?.let { PlaceHolderView(config) }
@@ -162,56 +185,6 @@ fun NumberInputTexField(
             colors = transparentTextFieldColors(),
         )
     }
-}
-
-// ---------------------------- Helpers ----------------------------
-
-private fun normalizeToEnglish(text: String): String {
-    return text.map { char ->
-        when (char) {
-            in '٠'..'٩' -> char - '٠' + '0'.code
-            in '০'..'৯' -> char - '০' + '0'.code
-            else -> char
-        }
-    }.joinToString("")
-}
-
-@Suppress("RegExpSimplifiable")
-private fun isValidInput(raw: String, maxLength: Int): Boolean {
-    if (raw.isEmpty()) return true
-    val regex = Regex("^\\d{0,$maxLength}(\\.\\d{0,2})?$")
-    return regex.matches(raw)
-}
-
-private fun formatFlexible(raw: String, withoutDecimal: Boolean): String {
-    val symbols = DecimalFormatSymbols(Locale.US)
-
-    if (withoutDecimal) {
-        val format = DecimalFormat("#,###", symbols)
-        return raw.toBigDecimalOrNull()?.let { format.format(it) } ?: raw
-    }
-
-    val parts = raw.split(".")
-    val intPart = parts[0]
-    val decimalPart = parts.getOrNull(1)
-
-    val format = DecimalFormat("#,###", symbols)
-    val formattedInt = intPart.toBigIntegerOrNull()
-        ?.let { format.format(it) }
-        ?: ""
-
-    return buildString {
-        append(formattedInt)
-        if (raw.contains(".")) {
-            append(".")
-            if (decimalPart != null) append(decimalPart)
-        }
-    }
-}
-
-private fun parseBigDecimal(raw: String, maxValue: BigDecimal?): BigDecimal? {
-    val parsed = raw.toBigDecimalOrNull() ?: return null
-    return if (maxValue == null || parsed <= maxValue) parsed else maxValue
 }
 
 // ---------------------------- Composable ----------------------------
@@ -225,9 +198,9 @@ private fun PlaceHolderView(config: NumberInputConfig) {
             textAlign = config.textAlign,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = placeholderColor
+            color = placeholderColor,
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 
@@ -239,25 +212,25 @@ private fun TrailingLabelView(trailingLabel: String) {
         text = trailingLabel,
         style = MaterialTheme.typography.bodyLarge.copy(
             fontSize = 16.sp,
-            color = trailingColor
-        )
+            color = trailingColor,
+        ),
     )
 }
 
 // ---------------------------- Preview ----------------------------
 @Preview(showBackground = true)
 @Composable
-fun PreviewCurrencyTextInput() {
+private fun PreviewCurrencyTextInput() {
     MaterialTheme {
         Column(Modifier.padding(16.dp)) {
-            NumberInputTexField(
+            NumberInputTextField(
                 initValue = BigDecimal("1000.00"),
-                config = NumberInputConfig(designFlat = true)
+                config = NumberInputConfig(designFlat = true),
             )
             Spacer(Modifier.height(16.dp))
-            NumberInputTexField(
+            NumberInputTextField(
                 initValue = BigDecimal("1000.00"),
-                config = NumberInputConfig(designFlat = false)
+                config = NumberInputConfig(designFlat = false),
             )
         }
     }
@@ -266,15 +239,15 @@ fun PreviewCurrencyTextInput() {
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES, // <- Dark mode
-    name = "Dark Mode Preview"
+    name = "Dark Mode Preview",
 )
 @Composable
-fun PreviewCurrencyTextInputDark() {
+private fun PreviewCurrencyTextInputDark() {
     MaterialTheme {
-        NumberInputTexField(
+        NumberInputTextField(
             modifier = Modifier.padding(16.dp),
             initValue = BigDecimal("1000.00"),
-            config = NumberInputConfig()
+            config = NumberInputConfig(),
         )
     }
 }

@@ -5,11 +5,17 @@ import android.content.Context
 import android.text.format.DateFormat
 import java.time.LocalTime
 
+/**
+ * Shows the platform time picker.
+ *
+ * [onInvalidTime] mirrors [showAppDatePicker]: a rejected pick used to vanish without feedback.
+ */
 fun showAppTimePicker(
     validateTime: (LocalTime) -> Boolean,
     onSelectedTime: (LocalTime) -> Unit,
     selectedTime: LocalTime?,
-    context: Context
+    context: Context,
+    onInvalidTime: (LocalTime) -> Unit = {},
 ) {
     val is24Hour = DateFormat.is24HourFormat(context)
     val initialTime = selectedTime ?: LocalTime.now()
@@ -20,11 +26,13 @@ fun showAppTimePicker(
             val pickedTime = LocalTime.of(hour, minute)
             if (validateTime(pickedTime)) {
                 onSelectedTime(pickedTime)
+            } else {
+                onInvalidTime(pickedTime)
             }
         },
         initialTime.hour,
         initialTime.minute,
-        is24Hour
+        is24Hour,
     )
 
     timePicker.show()

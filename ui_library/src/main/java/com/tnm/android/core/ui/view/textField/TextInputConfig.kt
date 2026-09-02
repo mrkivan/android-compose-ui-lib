@@ -16,7 +16,8 @@ data class TextInputConfig(
     val imeAction: ImeAction = ImeAction.Default,
     val capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
     val visualTransformation: VisualTransformation = VisualTransformation.None,
-    val designFlat: Boolean = false // New flag
+    // Flat draws without the card surface: no elevation, no shape, no horizontal padding.
+    val designFlat: Boolean = false,
 ) {
     fun resolvedMaxLines(): Int = if (singleLine) 1 else maxLines
 }

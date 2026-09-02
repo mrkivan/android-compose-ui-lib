@@ -10,9 +10,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -20,37 +19,34 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tnm.android.core.ui.R
 import com.tnm.android.core.ui.view.shape.SpacerHeightLarge
 import kotlin.math.roundToInt
 
 @Composable
 fun AppColorPlatterPicker(
+    onColorSelected: (Color) -> Unit,
+    modifier: Modifier = Modifier,
     initialColor: Color? = null,
-    onColorSelected: (Color) -> Unit
 ) {
-    var hue by remember { mutableStateOf(0f) }
-    var saturation by remember { mutableStateOf(1f) }
-    var value by remember { mutableStateOf(1f) }
-
-    var selectedColor by remember {
-        mutableStateOf(initialColor ?: Color.hsv(0f, 1f, 1f))
-    }
-
-    // Initialize HSV from initialColor ONCE
-    LaunchedEffect(initialColor) {
-        initialColor?.let { color ->
-            val hsv = FloatArray(3)
-            android.graphics.Color.colorToHSV(color.toArgb(), hsv)
-            hue = hsv[0]
-            saturation = hsv[1]
-            value = hsv[2]
-            selectedColor = color
+    // HSV is the source of truth. Deriving it back from the emitted colour loses hue whenever
+    // saturation or value hits 0 (grey and black have no hue), which snapped the slider to 0.
+    // Seed once and let the controls own it from there.
+    val seedHsv = remember(Unit) {
+        FloatArray(3).also { hsv ->
+            android.graphics.Color.colorToHSV((initialColor ?: Color.hsv(0f, 1f, 1f)).toArgb(), hsv)
         }
     }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    var hue by remember { mutableFloatStateOf(seedHsv[0]) }
+    var saturation by remember { mutableFloatStateOf(seedHsv[1]) }
+    var value by remember { mutableFloatStateOf(seedHsv[2]) }
 
+    val selectedColor = Color.hsv(hue, saturation, value)
+
+    Column(modifier = modifier.fillMaxWidth()) {
         // Color palette
         Canvas(
             modifier = Modifier
@@ -64,41 +60,39 @@ fun AppColorPlatterPicker(
                         saturation = s
                         value = v
 
-                        selectedColor = Color.hsv(hue, saturation, value)
-                        onColorSelected(selectedColor) // always called
+                        onColorSelected(Color.hsv(hue, saturation, value))
                     }
-                }
+                },
         ) {
             drawRect(
                 brush = Brush.horizontalGradient(
                     listOf(
                         Color.hsv(hue, 0f, 1f),
-                        Color.hsv(hue, 1f, 1f)
-                    )
+                        Color.hsv(hue, 1f, 1f),
+                    ),
                 ),
-                size = size
+                size = size,
             )
 
             drawRect(
                 brush = Brush.verticalGradient(
-                    listOf(Color.Transparent, Color.Black)
+                    listOf(Color.Transparent, Color.Black),
                 ),
-                size = size
+                size = size,
             )
         }
 
         SpacerHeightLarge()
 
         // Hue slider
-        Text(text = "Hue: ${hue.roundToInt()}")
+        Text(text = stringResource(R.string.color_picker_hue, hue.roundToInt()))
         Slider(
             value = hue,
             onValueChange = {
                 hue = it
-                selectedColor = Color.hsv(hue, saturation, value)
-                onColorSelected(selectedColor) // always called
+                onColorSelected(Color.hsv(hue, saturation, value))
             },
-            valueRange = 0f..360f
+            valueRange = 0f..360f,
         )
 
         SpacerHeightLarge()
@@ -109,7 +103,7 @@ fun AppColorPlatterPicker(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            color = selectedColor
+            color = selectedColor,
         ) {}
     }
 }

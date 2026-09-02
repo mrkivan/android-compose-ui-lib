@@ -35,22 +35,20 @@ fun <T> SpinnerBottomSheet(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        tonalElevation = 8.dp
+        tonalElevation = 8.dp,
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.75f)          // Core height for bottom sheet body
-                .padding(horizontal = 16.dp)    // Standard Material padding
-                .padding(top = 8.dp)
+                .fillMaxHeight(0.75f) // Core height for bottom sheet body
+                .padding(horizontal = 16.dp) // Standard Material padding
+                .padding(top = 8.dp),
         ) {
-
             // Header / Title
             SpinnerTopBar(
                 config = config,
                 onDismiss = { onDismiss(newSelectedItems) },
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
             )
 
             // Main content list (search + rows)
@@ -61,7 +59,7 @@ fun <T> SpinnerBottomSheet(
                 onSelectionChanged = { newSelectedItems = it },
                 itemContent = itemContent,
                 onDismiss = { onDismiss(newSelectedItems) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
     }

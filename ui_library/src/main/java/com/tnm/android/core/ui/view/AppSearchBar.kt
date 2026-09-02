@@ -34,9 +34,8 @@ fun AppSearchBar(
     placeHolder: String,
     onSearchChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 16.sp
+    fontSize: TextUnit = 16.sp,
 ) {
-
     TextField(
         value = search,
         onValueChange = {
@@ -58,7 +57,7 @@ fun AppSearchBar(
         leadingIcon = {
             Icon(
                 Icons.Default.Search,
-                contentDescription = stringResource(R.string.search)
+                contentDescription = stringResource(R.string.search),
             )
         },
         shape = RoundedCornerShape(16.dp),
@@ -81,22 +80,24 @@ fun AppSearchBar(
             unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
 
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
+        // Text, not Ascii: Ascii restricts the IME and blocks Bengali, Arabic and CJK search terms.
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
 
     )
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PreviewAppSearchBar() {
-    MaterialTheme {        // Your AppTheme() if you have one
+private fun PreviewAppSearchBar() {
+    MaterialTheme {
+        // Your AppTheme() if you have one
         var text by remember { mutableStateOf("") }
 
         AppSearchBar(
             search = text,
             placeHolder = "Search bg text",
             onSearchChange = { text = it },
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         )
     }
 }

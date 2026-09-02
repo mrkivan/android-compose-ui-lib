@@ -48,25 +48,23 @@ fun CircleWithNumber(number: Int, modifier: Modifier = Modifier) {
             .size(40.dp)
             .background(
                 MaterialTheme.colorScheme.primary,
-                shape = CircleShape
+                shape = CircleShape,
             ),
     ) {
         Text(
             text = number.toString(),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.align(Alignment.Center),
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
     }
-
-
 }
-
 
 @Composable
 fun CircularPercentageProgress(
     progress: Float, // 0f..1f
+    modifier: Modifier = Modifier,
     size: Dp = 50.dp,
     strokeWidth: Dp = 8.dp,
     progressColor: Color = MaterialTheme.colorScheme.primary,
@@ -74,12 +72,12 @@ fun CircularPercentageProgress(
     percentageTextStyle: TextStyle = TextStyle(
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Color.Black
-    )
+        color = MaterialTheme.colorScheme.onSurface,
+    ),
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(size)
+        modifier = modifier.size(size),
     ) {
         // Background circle
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -88,7 +86,7 @@ fun CircularPercentageProgress(
                 startAngle = -90f,
                 sweepAngle = 360f,
                 useCenter = false,
-                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round),
             )
 
             // Progress arc
@@ -97,14 +95,14 @@ fun CircularPercentageProgress(
                 startAngle = -90f,
                 sweepAngle = 360 * progress,
                 useCenter = false,
-                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round),
             )
         }
 
         // Percentage text
         Text(
             text = "${(progress * 100).toInt()}%",
-            style = percentageTextStyle
+            style = percentageTextStyle,
         )
     }
 }

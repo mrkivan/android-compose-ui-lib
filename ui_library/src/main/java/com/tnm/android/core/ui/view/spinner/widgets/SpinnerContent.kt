@@ -56,8 +56,11 @@ fun <T> SpinnerContent(
     val searchFlow = remember { MutableStateFlow("") }
     val filteredItems by produceState(initialValue = dataItems, searchFlow, dataItems) {
         searchFlow.debounce(200).collectLatest { query ->
-            value = if (query.isBlank()) dataItems
-            else dataItems.filter { config.rowLabel(it).contains(query, ignoreCase = true) }
+            value = if (query.isBlank()) {
+                dataItems
+            } else {
+                dataItems.filter { config.rowLabel(it).contains(query, ignoreCase = true) }
+            }
         }
     }
 
@@ -72,8 +75,11 @@ fun <T> SpinnerContent(
             onSelectionChanged(updated)
             onDismiss(updated)
         } else {
-            if (updated.contains(item)) updated.remove(item)
-            else updated.add(item)
+            if (updated.contains(item)) {
+                updated.remove(item)
+            } else {
+                updated.add(item)
+            }
             onSelectionChanged(updated)
         }
     }
@@ -86,7 +92,7 @@ fun <T> SpinnerContent(
                     search = it
                     searchFlow.value = it
                 },
-                placeholder = config.searchPlaceHolder.orEmpty()
+                placeholder = config.searchPlaceHolder.orEmpty(),
             )
         }
 
@@ -95,29 +101,25 @@ fun <T> SpinnerContent(
             selectedItems = currentSelected,
             config = config,
             onToggle = ::toggleSelection,
-            itemContent = itemContent
+            itemContent = itemContent,
         )
     }
 }
 
 @Composable
-private fun SpinnerSearchBarSection(
-    search: String,
-    onSearchChange: (String) -> Unit,
-    placeholder: String
-) {
+private fun SpinnerSearchBarSection(search: String, onSearchChange: (String) -> Unit, placeholder: String) {
     AppSearchBar(
         search = search,
         onSearchChange = onSearchChange,
-        placeHolder = placeholder.ifBlank { "Search..." },
+        placeHolder = placeholder.ifBlank { stringResource(R.string.search_hint) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
     )
 
     HorizontalDivider(
         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-        thickness = 1.dp
+        thickness = 1.dp,
     )
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -136,44 +138,46 @@ private fun <T> SpinnerListSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(32.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = stringResource(R.string.search_empty),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         return
     }
 
-    val isGrid = config.isGrid.first
-    val gridSpanCount = config.isGrid.second.coerceAtLeast(1)
+    val gridColumns = config.effectiveGridColumns
 
-    if (isGrid) {
+    if (gridColumns != null) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(gridSpanCount),
+            columns = GridCells.Fixed(gridColumns),
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(items, key = { it.hashCode() }) { item ->
+            items(items) { item ->
                 SpinnerItemView(
                     item = item,
                     isSelected = selectedItems.contains(item),
                     isGrid = true,
                     config = config,
                     onToggle = onToggle,
-                    itemContent = itemContent
+                    itemContent = itemContent,
                 )
             }
         }
     } else {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            itemsIndexed(items, key = { _, item -> item.hashCode() }) { index, item ->
+            // No key: hashCode() is not a stable identity — duplicates or colliding items make
+            // Compose throw "Key was already used". Consumers wanting stable keys across
+            // insert/remove should supply itemContent with their own keyed content.
+            itemsIndexed(items) { index, item ->
                 SpinnerItemView(
                     item = item,
                     isSelected = selectedItems.contains(item),
@@ -181,7 +185,7 @@ private fun <T> SpinnerListSection(
                     config = config,
                     onToggle = onToggle,
                     itemContent = itemContent,
-                    showDivider = index != items.lastIndex // remove divider for last
+                    showDivider = index != items.lastIndex, // remove divider for last
                 )
             }
         }
@@ -196,7 +200,7 @@ private fun <T> SpinnerItemView(
     config: SmartSpinnerConfig<T>,
     onToggle: (T) -> Unit,
     itemContent: (@Composable (item: T, selected: Boolean) -> Unit)? = null,
-    showDivider: Boolean = true
+    showDivider: Boolean = true,
 ) {
     if (isGrid) {
         Surface(
@@ -208,20 +212,25 @@ private fun <T> SpinnerItemView(
                 },
             shape = MaterialTheme.shapes.medium,
             tonalElevation = 4.dp,
-            color = if (isSelected)
+            color = if (isSelected) {
                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-            else MaterialTheme.colorScheme.surface
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
         ) {
             Column(
                 modifier = Modifier.padding(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                if (itemContent != null) itemContent(item, isSelected)
-                else SpinnerDefaultCol(
-                    label = config.rowLabel(item),
-                    isSelected = isSelected,
-                    isMultiSelectEnable = config.multiSelectEnable
-                )
+                if (itemContent != null) {
+                    itemContent(item, isSelected)
+                } else {
+                    SpinnerDefaultCol(
+                        label = config.rowLabel(item),
+                        isSelected = isSelected,
+                        isMultiSelectEnable = config.multiSelectEnable,
+                    )
+                }
             }
         }
     } else {
@@ -234,20 +243,23 @@ private fun <T> SpinnerItemView(
                     .semantics {
                         selected = isSelected
                     },
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (itemContent != null) itemContent(item, isSelected)
-                else SpinnerDefaultRow(
-                    label = config.rowLabel(item),
-                    isSelected = isSelected,
-                    isMultiSelectEnable = config.multiSelectEnable
-                )
+                if (itemContent != null) {
+                    itemContent(item, isSelected)
+                } else {
+                    SpinnerDefaultRow(
+                        label = config.rowLabel(item),
+                        isSelected = isSelected,
+                        isMultiSelectEnable = config.multiSelectEnable,
+                    )
+                }
             }
 
             if (showDivider) {
                 HorizontalDivider(
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                    thickness = 1.dp
+                    thickness = 1.dp,
                 )
             }
         }

@@ -26,56 +26,48 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 @Composable
-fun BalanceUsageProgressBar(
-    balance: BigDecimal,
-    maxLimit: BigDecimal,
-    modifier: Modifier = Modifier
-) {
+fun BalanceUsageProgressBar(balance: BigDecimal, maxLimit: BigDecimal, modifier: Modifier = Modifier) {
     var showCreditUsed by remember { mutableStateOf(false) }
+    // Never below ONE, so the division below cannot hit zero.
     val safeCreditLimit = maxLimit.coerceAtLeast(BigDecimal.ONE)
 
     val availableCredit = (maxLimit - balance).coerceAtLeast(BigDecimal.ZERO)
     val creditUsed = balance.coerceAtLeast(BigDecimal.ZERO)
 
-    val progressFraction: BigDecimal = if (safeCreditLimit.compareTo(BigDecimal.ZERO) == 0) {
-        BigDecimal.ZERO
-    } else if (showCreditUsed) {
-        creditUsed.divide(safeCreditLimit, 4, RoundingMode.HALF_UP)
-    } else {
-        availableCredit.divide(safeCreditLimit, 4, RoundingMode.HALF_UP)
-    }
+    val progressFraction: BigDecimal = (if (showCreditUsed) creditUsed else availableCredit)
+        .divide(safeCreditLimit, 4, RoundingMode.HALF_UP)
 
     val animatedProgress by animateFloatAsState(
         targetValue = progressFraction.toFloat().coerceIn(0f, 1f),
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
-        label = "credit_usage_progress_animation"
+        label = "credit_usage_progress_animation",
     )
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { showCreditUsed = !showCreditUsed },
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = (if (showCreditUsed) creditUsed else availableCredit).formatWithComma(),
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Text(
                 text = maxLimit.formatWithComma(),
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
 
         LinearProgressIndicator(
-            modifier = modifier,
-            progress = { animatedProgress }
+            modifier = Modifier.fillMaxWidth(),
+            progress = { animatedProgress },
         )
     }
 }
@@ -89,7 +81,7 @@ private fun PreviewBalanceUsageProgressBar() {
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 BalanceUsageProgressBar(
                     balance = BigDecimal("25000.00"),

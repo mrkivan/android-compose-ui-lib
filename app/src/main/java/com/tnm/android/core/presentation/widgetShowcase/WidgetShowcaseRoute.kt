@@ -5,10 +5,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 
 @Composable
-fun WidgetShowcaseRoute(
-    navController: NavHostController,
-    screenData: WidgetShowcaseState? = null,
-    viewModel: WidgetShowcaseViewModel = hiltViewModel(),
-) {
-    WidgetShowcaseScreen(navController, viewModel, screenData)
+fun WidgetShowcaseRoute(navController: NavHostController, viewModel: WidgetShowcaseViewModel = hiltViewModel()) {
+    WidgetShowcaseScreen(navController, viewModel)
 }

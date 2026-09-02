@@ -14,9 +14,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-class AndroidKeyStoreCryptoManager(
-    private val keyAlias: String
-) : EncryptionManager {
+class AndroidKeyStoreCryptoManager(private val keyAlias: String) : EncryptionManager {
 
     private companion object {
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
@@ -28,8 +26,11 @@ class AndroidKeyStoreCryptoManager(
     private val secretKey: SecretKey by lazy { getOrCreateSecretKey() }
 
     @Throws(
-        KeyStoreException::class, NoSuchAlgorithmException::class, IOException::class,
-        UnrecoverableEntryException::class, InvalidAlgorithmParameterException::class
+        KeyStoreException::class,
+        NoSuchAlgorithmException::class,
+        IOException::class,
+        UnrecoverableEntryException::class,
+        InvalidAlgorithmParameterException::class,
     )
     private fun getOrCreateSecretKey(): SecretKey {
         val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE).apply { load(null) }
@@ -41,7 +42,7 @@ class AndroidKeyStoreCryptoManager(
         val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
         val keySpec = KeyGenParameterSpec.Builder(
             keyAlias,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
         )
             .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
@@ -52,25 +53,30 @@ class AndroidKeyStoreCryptoManager(
         return keyGenerator.generateKey()
     }
 
-    override fun encrypt(plainText: String): String {
-        return try {
-            val cipher = Cipher.getInstance(CIPHER_ALGORITHM)
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+    override fun encrypt(plainText: String): String = try {
+        val cipher = Cipher.getInstance(CIPHER_ALGORITHM)
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
 
-            val iv = cipher.iv
-            val encryptedBytes = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
-            val combined = iv + encryptedBytes
-            Base64.encodeToString(combined, Base64.DEFAULT)
-        } catch (e: Exception) {
-            throw EncryptionException("Failed to encrypt data using Android KeyStore.", e)
-        }
+        val iv = cipher.iv
+        val encryptedBytes = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+        val combined = iv + encryptedBytes
+        // NO_WRAP: DEFAULT inserts line breaks, which corrupt the value once it is put in
+        // JSON, a URL, or an HTTP header.
+        Base64.encodeToString(combined, Base64.NO_WRAP)
+    } catch (e: Exception) {
+        throw EncryptionException("Failed to encrypt data using Android KeyStore.", e)
     }
 
     override fun decrypt(encryptedData: String): String {
         if (encryptedData.isEmpty()) throw DecryptionException("Encrypted data cannot be empty.")
 
         return try {
+            // DEFAULT on decode still accepts unwrapped input, so values written by earlier
+            // versions of this class keep decrypting.
             val combined = Base64.decode(encryptedData, Base64.DEFAULT)
+            if (combined.size <= GCM_IV_SIZE) {
+                throw DecryptionException("Encrypted payload is too short to contain an IV.")
+            }
 
             val iv = combined.copyOfRange(0, GCM_IV_SIZE)
             val encryptedBytes = combined.copyOfRange(GCM_IV_SIZE, combined.size)
@@ -82,6 +88,8 @@ class AndroidKeyStoreCryptoManager(
 
             val decryptedBytes = cipher.doFinal(encryptedBytes)
             String(decryptedBytes, Charsets.UTF_8)
+        } catch (e: DecryptionException) {
+            throw e // already precise; re-wrapping would hide the reason
         } catch (e: Exception) {
             throw DecryptionException("Failed to decrypt data using Android KeyStore.", e)
         }
