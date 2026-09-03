@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build](https://github.com/mrkivan/android-compose-ui-lib/actions/workflows/publish.yml/badge.svg)](https://github.com/mrkivan/android-compose-ui-lib/actions/workflows/publish.yml)
-[![GitHub Packages](https://img.shields.io/badge/GitHub%20Packages-3.0.0-blue.svg)](https://github.com/mrkivan/android-compose-ui-lib/packages)
+[![GitHub Packages](https://img.shields.io/badge/GitHub%20Packages-3.1.0-blue.svg)](https://github.com/mrkivan/android-compose-ui-lib/packages)
 [![Issues](https://img.shields.io/github/issues/mrkivan/android-compose-ui-lib.svg)](https://github.com/mrkivan/android-compose-ui-lib/issues)
 [![GitHub stars](https://img.shields.io/github/stars/mrkivan/android-compose-ui-lib.svg?style=social)](https://github.com/mrkivan/android-compose-ui-lib/stargazers)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4-blue.svg)](https://kotlinlang.org/)
@@ -33,7 +33,7 @@ maven {
 }
 //build.gradle.kts 
 dependencies {
-    implementation("com.tnm.android.core:ui-library:3.0.0")
+    implementation("com.tnm.android.core:ui-library:3.1.0")
 }
 ```
 ```bash
